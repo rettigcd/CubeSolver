@@ -3,11 +3,13 @@ using AiSearch.OneSide;
 
 namespace CubeSolver {
 
+	// Passed to the AISearch to generate all possible moves from any cube position
 	class CubeMoveGenerator : MoveGenerator<Cube> {
 
 		static readonly CubeMove[] AllPossibleMoves;
 
 		static CubeMoveGenerator() {
+
 			// Build all possible single turns
 			var allPossibleTurns = new List<CubeMove>();
 			foreach(var side in Cube.AllSides)
@@ -20,6 +22,7 @@ namespace CubeSolver {
 
 	}
 
+	// Used by the Solver / AISearch project to generate child states.
 	class CubeMove : Move<Cube> {
 		public Turn _turn;
 		public CubeMove( Turn turn ) { _turn = turn; }

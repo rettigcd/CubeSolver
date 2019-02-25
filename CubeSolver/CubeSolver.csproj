@@ -62,8 +62,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CornerMatch.cs" />
+    <Compile Include="CubeMatch.cs" />
     <Compile Include="Direction.cs" />
     <Compile Include="Edge.cs" />
+    <Compile Include="EdgeMatch.cs" />
     <Compile Include="Scrambler.cs" />
     <Compile Include="Solver_Tests.cs" />
     <Compile Include="SquarePositionSequence.cs" />
@@ -75,7 +78,7 @@
     <Compile Include="Solver.cs" />
     <Compile Include="SquarePos.cs" />
     <Compile Include="Turn.cs" />
-    <Compile Include="TurnGenerator.cs" />
+    <Compile Include="CubeMoveGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

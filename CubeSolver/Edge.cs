@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using AiSearch.OneSide;
-using Xunit;
-
+﻿
 namespace CubeSolver {
 
 	public class Edge {
@@ -12,6 +8,16 @@ namespace CubeSolver {
 
 		public SquarePos Pos0 => SquarePos.Get(Side0,Side1);
 		public SquarePos Pos1 => SquarePos.Get(Side1,Side0);
+
+		/// <summary>
+		/// In same location mut may have different orientation
+		/// </summary>
+		/// <param name="edge"></param>
+		/// <returns></returns>
+		public bool InSameSpace( Edge other ) {
+			return (Side0 == other.Side0 && Side1 == other.Side1)
+				|| (Side1 == other.Side0 && Side0 == other.Side1);
+		}
 
 	}
 

@@ -6,141 +6,133 @@ using Xunit;
 
 namespace CubeSolver {
 
-	public class EdgeMatch {
-
-		static public EdgeMatch Stationary( Edge edge ) => new EdgeMatch( edge, edge );
-
-		public EdgeMatch(Edge fromColor, Edge toLocation) {
-			this.FromColor = fromColor;
-			this.ToLocation = toLocation;
-		}
-
-		/// <summary> 
-		/// Since initially, all pieces are in their starting position,
-		/// this is both the initial location and the 'color' of the piece we are going to move. 
-		/// Note: .
-		/// </summary>
-		/// <remarks>
-		/// We are using Side to designate color. 
-		/// Instead of the top being 'White' color, the top is 'Top' color. </remarks>
-		public Edge FromColor { get; private set; }
-
-		/// <summary>
-		/// Where we want the piece to be;
-		/// </summary>
-		public Edge ToLocation { get; private set; }
-
-		public bool IsMatch( Cube cube ) {
-			return cube[ ToLocation.Pos0 ] == FromColor.Side0
-				&& cube[ ToLocation.Pos1 ] == FromColor.Side1;
-		}
-	}
-
-
 	public class Solver {
 
-		Edge frontBottomEdge = new Edge( Side.Front, Side.Bottom );
-
-		[Fact]
-		public void CanSeeEdgeIsSolved() {
-
-			var turns = GetStepsToAcheiveMatch( EdgeMatch.Stationary( frontBottomEdge ) );
-			Assert.Empty(turns);
-
+		void Assert_CanMoveEdgeToBottomCross(Side side0, Side side1, int expectedNumberOfTurns) {
+			var startingPosition = new Edge(side0,side1);
+			var destination = new Edge( Side.Front, Side.Down );
+			var turns = GetStepsToPlaceCrossEdge( startingPosition, destination );
+			Assert.Equal( expectedNumberOfTurns, turns.Length );
 		}
 
 		[Fact]
-		public void Requires_1Turn1() {
-			var turns = GetStepsToAcheiveMatch( new EdgeMatch( new Edge( Side.Front, Side.Right ), frontBottomEdge ) );
-			var turn = Assert.Single(turns);
-			Assert_TurnIs(Side.Front,Direction.Clockwise,turn);
-		}
-
-		[Fact]
-		public void Requires_1Turn2() {
-			var turns = GetStepsToAcheiveMatch( new EdgeMatch( new Edge( Side.Front, Side.Left ), frontBottomEdge ) );
-			var turn = Assert.Single(turns);
-			Assert_TurnIs(Side.Front,Direction.CounterClockwise,turn);
-		}
-
-		[Fact]
-		public void Requres_2Turns1() {
-			var turns = GetStepsToAcheiveMatch( new EdgeMatch( new Edge( Side.Front, Side.Top ), frontBottomEdge ) );
-			Assert.Equal(2, turns.Length);
-			Assert_TurnIs(Side.Front,Direction.Clockwise,turns[0]);
-			Assert_TurnIs(Side.Front,Direction.Clockwise,turns[1]);
-		}
-
-//		[Fact]
-		public void CanFindAllMovesToPlaceCrossEdge() {	 // !!!
-			Turn[] turns;
+		public void CanFindAllMovesToPlaceCrossEdge() {
 
 			// bottom row
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Bottom,Side.Right) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Bottom,Side.Left) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Bottom,Side.Back) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Bottom,Side.Front) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Right,Side.Bottom) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Left,Side.Bottom) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Back,Side.Bottom) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Front,Side.Bottom) ); Assert.NotNull( turns );
-
-			// tops
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Top,Side.Front) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Front,Side.Top) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Top,Side.Left) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Left,Side.Top) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Top,Side.Right) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Right,Side.Top) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Top,Side.Back) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Back,Side.Top) ); Assert.NotNull( turns );
+			Assert_CanMoveEdgeToBottomCross(Side.Front,Side.Down,0);
+			Assert_CanMoveEdgeToBottomCross(Side.Right,Side.Down,4);
+			Assert_CanMoveEdgeToBottomCross(Side.Left,Side.Down,4);
+			Assert_CanMoveEdgeToBottomCross(Side.Back,Side.Down,6);
+			Assert_CanMoveEdgeToBottomCross(Side.Down,Side.Right,2);
+			Assert_CanMoveEdgeToBottomCross(Side.Down,Side.Left,2);
+			Assert_CanMoveEdgeToBottomCross(Side.Down,Side.Back,4);
+			Assert_CanMoveEdgeToBottomCross(Side.Down,Side.Front,4);
 
 			// Middle row
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Front,Side.Right) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Right,Side.Front) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Front,Side.Left) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Left,Side.Front) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Right,Side.Back) ); Assert.NotNull( turns );
-			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Left,Side.Back) ); Assert.NotNull( turns );
-// 			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Back,Side.Left) ); Assert.NotNull( turns ); // Out of memory
-//			turns = GetStepsToPlaceCrossEdge( new Edge(Side.Back,Side.Right) ); Assert.NotNull( turns ); // Not enough memory
+			Assert_CanMoveEdgeToBottomCross(Side.Front,Side.Right,1);
+			Assert_CanMoveEdgeToBottomCross(Side.Right,Side.Front,3);
+			Assert_CanMoveEdgeToBottomCross(Side.Front,Side.Left,1);
+			Assert_CanMoveEdgeToBottomCross(Side.Left,Side.Front,3);
+			Assert_CanMoveEdgeToBottomCross(Side.Right,Side.Back,3);
+			Assert_CanMoveEdgeToBottomCross(Side.Left,Side.Back,3);
+ 			Assert_CanMoveEdgeToBottomCross(Side.Back,Side.Left,5);
+			Assert_CanMoveEdgeToBottomCross(Side.Back,Side.Right,5);
+
+			// top row
+			Assert_CanMoveEdgeToBottomCross(Side.Front,Side.Up,2);
+			Assert_CanMoveEdgeToBottomCross(Side.Up,Side.Front,4);
+			Assert_CanMoveEdgeToBottomCross(Side.Left,Side.Up,3);
+			Assert_CanMoveEdgeToBottomCross(Side.Up,Side.Left,3);
+			Assert_CanMoveEdgeToBottomCross(Side.Right,Side.Up,3);
+			Assert_CanMoveEdgeToBottomCross(Side.Up,Side.Right,3);
+			Assert_CanMoveEdgeToBottomCross(Side.Back,Side.Up,4);
+			Assert_CanMoveEdgeToBottomCross(Side.Up,Side.Back,4);
 
 		}
 
 		[Fact]
-		public void Requres_3Turns() {
-			Edge initialEdgePosition = new Edge( Side.Top, Side.Right );
-			Turn[] turns = GetStepsToPlaceCrossEdge( initialEdgePosition );
+		public void CanPlaceCornerEdgePair() {
+/*
+			// Use key-hole method to bring turn count down for all but last pair...
 
-			Assert.Equal( 3, turns.Length );
-			Assert_TurnIs( Side.Right, Direction.CounterClockwise, turns[0] );
-			Assert_TurnIs( Side.Front, Direction.Clockwise, turns[1] );
-			Assert_TurnIs( Side.Right, Direction.Clockwise, turns[2] );
+			Corner[] startingCornerPositions = new [] {
+				new Corner( Side.Up, Side.Right, Side.Front ),
+				new Corner( Side.Right, Side.Front, Side.Up ),
+				// This is not all the corner locations, there are 3*5=15 total
+			};
+
+			Edge[] staringEdgePositions = new [] {
+				new Edge( Side.Up, Side.Front ),
+				new Edge( Side.Up, Side.Right ),
+				new Edge( Side.Up, Side.Back ),
+				new Edge( Side.Up, Side.Left ),
+				new Edge( Side.Front, Side.Up ),
+				new Edge( Side.Right, Side.Up ),
+				new Edge( Side.Back, Side.Up ),
+				new Edge( Side.Left, Side.Up )
+				// not all the corner locations, there are 5*2 total (assuming we can't get from other slot)
+
+			};
+
+			foreach(var corner in startingCornerPositions)
+				foreach(var edge in staringEdgePositions)
+					CanPlaceCornerEdgePair_Inner( edge, corner );
+*/
 		}
 
-		Turn[] GetStepsToPlaceCrossEdge( Edge initialEdgePosition ) {
+		void CanPlaceCornerEdgePair_Inner( Edge edgeSource, Corner cornerSource ) {
+
+			Edge edgeDestination = new Edge( Side.Front, Side.Right );
+			Corner cornerDestination = new Corner(Side.Down,Side.Front,Side.Right);
+
+			var crossConstraints = new [] {
+				new Edge( Side.Down, Side.Right ),
+				new Edge( Side.Down, Side.Left ),
+				new Edge( Side.Down, Side.Back )
+			}.Select( x=>EdgeMatch.Stationary(x) );
+
+			CubeMatch[] otherPairConstriants = new CubeMatch[] {
+				CornerMatch.Stationary(new Corner(Side.Down,Side.Right,Side.Back)),
+				CornerMatch.Stationary(new Corner(Side.Down,Side.Back,Side.Left)),
+				CornerMatch.Stationary(new Corner(Side.Down,Side.Left,Side.Front)),
+				EdgeMatch.Stationary(new Edge(Side.Right,Side.Back)),
+				EdgeMatch.Stationary(new Edge(Side.Back,Side.Left)),
+				EdgeMatch.Stationary(new Edge(Side.Left,Side.Front)),
+			};
+
+			var constraints = new List<CubeMatch>();
+			constraints.AddRange( crossConstraints );
+			constraints.AddRange( otherPairConstriants );
+			constraints.Add( new EdgeMatch( edgeSource, edgeDestination ) );
+			constraints.Add( new CornerMatch( cornerSource, cornerDestination ));
+
+			var turns = GetStepsToAcheiveMatch( 8, constraints.ToArray() );
+			string s = string.Join("",(IEnumerable<Turn>)turns);
+			int i = 0;
+
+		}
+
+		Turn[] GetStepsToPlaceCrossEdge( Edge initialEdgePosition, Edge destination ) {
 
 			var bottomEdges = new [] {
-				new Edge( Side.Bottom, Side.Right ),
-				new Edge( Side.Bottom, Side.Left ),
-				new Edge( Side.Bottom, Side.Back )
+				new Edge( Side.Down, Side.Right ),
+				new Edge( Side.Down, Side.Left ),
+				new Edge( Side.Down, Side.Back )
 			};
 
 			var bottomEdgeStationaryConstraints = bottomEdges
-				.Where( e=>!e.Equals(initialEdgePosition) )
+				.Where( e=>!e.InSameSpace(initialEdgePosition) )
 				.Select( x=>EdgeMatch.Stationary(x) );
 
 			var constraints = new List<EdgeMatch>();
-			constraints.AddRange( bottomEdgeStationaryConstraints );
-			constraints.Add( new EdgeMatch( initialEdgePosition, frontBottomEdge ) );
+			constraints.AddRange( bottomEdgeStationaryConstraints ); // unmoved
+			constraints.Add( new EdgeMatch( initialEdgePosition, destination ) );
 
-			var turns = GetStepsToAcheiveMatch( constraints.ToArray() );
-
-			string msg = string.Join(" => ",(IEnumerable<Turn>)turns);
-			// Console.WriteLine( msg );
-			System.Diagnostics.Debug.WriteLine( msg );
-			return turns;
+			return GetStepsToAcheiveMatch( 6, constraints.ToArray() );
 		}
+
+		string GetStepsToPlaceCrossEdgeAsString( Edge initialEdgePosition, Edge destination ) =>
+			string.Join("",(IEnumerable<Turn>)GetStepsToPlaceCrossEdge(initialEdgePosition,destination));
 
 		void Assert_TurnIs(Side side, Direction dir, Turn turn ) {
 			Assert.Equal(side,turn.Side);
@@ -149,10 +141,12 @@ namespace CubeSolver {
 
 		CubeMoveGenerator moveGenerator = new CubeMoveGenerator();
 
-		Turn[] GetStepsToAcheiveMatch( params EdgeMatch[] matches ) {
+		Turn[] GetStepsToAcheiveMatch( int maxTurnCount, params CubeMatch[] matches ) {
 			var cube = new Cube();
 
-			var winner = new BreadthFirst<Cube>( new Node<Cube>( new Cube(), null ), moveGenerator, 8 ).IterateFilteringOutAncestors()
+			var moveIterator = new IterativeDeepeningIterator<Cube>( moveGenerator, maxTurnCount ) { DontRepeat = true }; // BreadthFirst runs out of memory...
+
+			Node<Cube> winner = moveIterator.Iterate( new Cube() )
 				.FirstOrDefault( node => matches.All(match=>match.IsMatch( node.State )) );
 
 			if( winner == null ) throw new Exception( "no solution found" );
@@ -160,66 +154,6 @@ namespace CubeSolver {
 			var path = winner.GetNodePath();
 			return path.Skip( 1 ).Select( x => ((CubeMove)x.Move)._turn ).ToArray();
 		}
-
-		public void CanFindMoveToMakeCrossPiece() {
-
-			// -- Solved --
-			// Front / Bottom => Front / Bottom
-
-			// -- Middle row --
-			// Front/Right => Front/Bottom, Keep: Bottom/Right Bottom/Back Bottom/Left
-			// Right/Front => Front/Bottom, Keep: Bottom/Right Bottom/Back Bottom/Left
-
-			// Front/Left => Front/Bottom, Keep: Bottom/Right Bottom/Back Bottom/Left
-			// Left/Front => Front/Bottom, Keep: Bottom/Right Bottom/Back Bottom/Left
-
-			// Back/Right => Front/Bottom, Keep: Bottom/Right Bottom/Back Bottom/Left
-			// Right/Back => Front/Bottom, Keep: Bottom/Right Bottom/Back Bottom/Left
-
-			// Back/Left => Front/Bottom, Keep: Bottom/Right Bottom/Back Bottom/Left
-			// Left/Back => Front/Bottom, Keep: Bottom/Right Bottom/Back Bottom/Left
-
-			// -- Top Row --
-			// Front/Top => Front / Bottom
-			// Top/Front => Front / Bottom
-
-			// Left/Top => Front / Bottom
-			// Top/Left => Front / Bottom
-
-			// Back/Top => Front / Bottom
-			// Top/Back => Front / Bottom
-
-			// Right/Top => Front / Bottom
-			// Top/Right => Front / Bottom
-
-			// -- Bottom Row --
-			// Right/Bottom => Front / Bottom  (allow other slot to move)
-			// Bottom/Right => Front / Bottom  (allow other slot to move)
-
-			// Back/Bottom => Front / Bottom   (allow other slot to move)
-			// Bottom/Back => Front / Bottom   (allow other slot to move)
-
-			// Left/Bottom => Front / Bottom   (allow other slot to move)
-			// Bottom/Left => Front / Bottom   (allow other slot to move)
-
-			// -- Solved --
-			// Front / Bottom => Front / Bottom
-
-		}
-
-
-		// make the cross without disturbing other cross
-			// 4 slots on side * 2 orientations
-			// 4 slots on bottom * 2 orientations
-			// 7 on top
-			// 1 solved
-
-		// fill the slots without distrubing other slots
-
-		// last layer part 1
-		// last layer part 2
-
-
 
 	}
 

@@ -10,13 +10,23 @@ namespace CubeSolver {
 
 		static Dictionary<Side,ClockwiseSequenceGroup> _clockwiseTurnGroups;
 
+		static readonly Side[] _solvedStickers;
+
+		static public readonly Side[] AllSides = new[] { Side.Up,Side.Front,Side.Left,Side.Down,Side.Back,Side.Right };
+
 		static Cube() {
+
+			// Init Solved
+			_solvedStickers = new Side[54];
+			foreach(var face in AllSides)
+				foreach(var pos in Cube.GetSquarePositionsForSide(face))
+					_solvedStickers[pos.Index] = face;
+
+			// Init Turn-Group mappings
 			_clockwiseTurnGroups = new Dictionary<Side, ClockwiseSequenceGroup>();
 			foreach(var side in AllSides)
 				_clockwiseTurnGroups.Add(side,new ClockwiseSequenceGroup(side));
 		}
-
-		static public readonly Side[] AllSides = new[] { Side.Top,Side.Front,Side.Left,Side.Bottom,Side.Back,Side.Right };
 
 		static public SquarePos[] GetSquarePositionsForSide( Side side ) {
 
@@ -48,8 +58,8 @@ namespace CubeSolver {
 				case Side.Front: return Side.Back;
 				case Side.Left: return Side.Right;
 				case Side.Right: return Side.Left;
-				case Side.Top: return Side.Bottom;
-				case Side.Bottom: return Side.Top;
+				case Side.Up: return Side.Down;
+				case Side.Down: return Side.Up;
 				default: throw new ArgumentException($"Invalid value for {nameof(side)}:{side}");
 			}
 		}
@@ -57,38 +67,34 @@ namespace CubeSolver {
 		#endregion
 
 		public Cube() {
-			_stickers = new Dictionary<SquarePos, Side>();
-			foreach(var face in AllSides)
-				foreach(var pos in Cube.GetSquarePositionsForSide(face))
-					_stickers.Add(pos,face);
+			_stickers = new Side[54];
+			Array.Copy(_solvedStickers,_stickers,54);
 		}
 
 		/// <remarks>private because I like the .Clone() api butter than a copy constructor</remarks>
 		Cube( Cube src ) {
-			_stickers = src._stickers.ToDictionary(p=>p.Key,p=>p.Value);
+			_stickers = new Side[54];
+			Array.Copy( src._stickers, _stickers, 54 );
 		}
 
 		public Side this[SquarePos pos] {
-			get { return _stickers[pos]; }
-			set { _stickers[pos] = value; }
-		}
-
-		public void Turn( Turn turn ) {
-			var grp = _clockwiseTurnGroups[turn.Side];
-			if(turn.Direction == Direction.Clockwise)
-				grp.Advance( _stickers );
-			else 
-				grp.Retreat( _stickers );
+			get { return _stickers[pos.Index]; }
+			set { _stickers[pos.Index] = value; }
 		}
 
 		public Cube ApplyTurn( Turn turn ) {
 			var child = Clone();
-			child.Turn( turn );
+
+			var grp = _clockwiseTurnGroups[turn.Side];
+			if(turn.Direction == Direction.Clockwise)
+				grp.Advance( _stickers, child._stickers );
+			else 
+				grp.Retreat( _stickers, child._stickers );
+
 			return child;
 		}
 
-		public bool IsSolved =>_stickers
-			.All(pair=>pair.Key.Face == pair.Value);
+		public bool IsSolved => _stickers.SequenceEqual(_solvedStickers);
 
 		public Cube Clone() => new Cube(this);
 
@@ -98,7 +104,7 @@ namespace CubeSolver {
 
 		public bool Equals( Cube other ) {
 			return !Object.ReferenceEquals(other,null)
-				&& _stickers.Keys.All(k=>_stickers[k] == other._stickers[k]);
+				&& _stickers.SequenceEqual(other._stickers);
 		}
 
 		public override bool Equals( object obj ) {
@@ -107,7 +113,7 @@ namespace CubeSolver {
 
 		#endregion
 
-		Dictionary<SquarePos,Side> _stickers;
+		Side[] _stickers;
 
 	}
 

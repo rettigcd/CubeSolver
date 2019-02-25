@@ -12,8 +12,20 @@ namespace CubeSolver {
 			this.Direction = direction;
 		}
 
-		public override string ToString() {
-			return this.Side+":"+this.Direction;
+		public override string ToString() => Direction == Direction.Clockwise ? SideSymbol : SideSymbol + "'";
+
+		string SideSymbol => GetSideSymbol( Side );
+
+		static string GetSideSymbol(Side side) {
+			switch(side) {
+				case Side.Up:    return "U";
+				case Side.Down:  return "D";
+				case Side.Left:  return "L";
+				case Side.Right: return "R";
+				case Side.Front: return "F";
+				case Side.Back:  return "B";
+				default: throw new ArgumentException($"Invalid Side {side}.");
+			}
 		}
 
 	}

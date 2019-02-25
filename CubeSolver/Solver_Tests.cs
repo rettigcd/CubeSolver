@@ -1,8 +1,13 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Xunit;
 
 namespace CubeSolver {
+
+	// There are approximately:
+	// 1 Million - 6-move positions
+	// 21 Million - 7-move
+	// 234 Milion - 8-move positions
+
 
 	public class Solver_Tests {
 
@@ -11,8 +16,8 @@ namespace CubeSolver {
 			new object[] { Side.Front },
 			new object[] { Side.Left },
 			new object[] { Side.Right },
-			new object[] { Side.Top },
-			new object[] { Side.Bottom },
+			new object[] { Side.Up },
+			new object[] { Side.Down },
 		};
 
 		[Theory]
@@ -61,7 +66,7 @@ namespace CubeSolver {
 		}
 
 		[Theory]
-		[InlineData(Side.Top, Side.Bottom)]
+		[InlineData(Side.Up, Side.Down)]
 		[InlineData(Side.Left, Side.Right)]
 		[InlineData(Side.Front, Side.Back)]
 		public void OppositeSidesOfCube(Side s1, Side s2) {
@@ -93,23 +98,23 @@ namespace CubeSolver {
 			var cube = new Cube();
 			Assert_IsSolved( cube );
 
-			cube.Turn(new Turn(Side.Top, Direction.Clockwise) );
+			cube = cube.ApplyTurn(new Turn(Side.Up, Direction.Clockwise) );
 
-			Assert.Equal(Side.Right,cube[SquarePos.Get(Side.Front,Side.Top)]);
-			Assert.Equal(Side.Right,cube[SquarePos.Get(Side.Front,Side.Top|Side.Left)]);
-			Assert.Equal(Side.Right,cube[SquarePos.Get(Side.Front,Side.Top|Side.Right)]);
+			Assert.Equal(Side.Right,cube[SquarePos.Get(Side.Front,Side.Up)]);
+			Assert.Equal(Side.Right,cube[SquarePos.Get(Side.Front,Side.Up|Side.Left)]);
+			Assert.Equal(Side.Right,cube[SquarePos.Get(Side.Front,Side.Up|Side.Right)]);
 
-			Assert.Equal(Side.Back,cube[SquarePos.Get(Side.Right,Side.Top)]);
-			Assert.Equal(Side.Back,cube[SquarePos.Get(Side.Right,Side.Top|Side.Front)]);
-			Assert.Equal(Side.Back,cube[SquarePos.Get(Side.Right,Side.Top|Side.Back)]);
+			Assert.Equal(Side.Back,cube[SquarePos.Get(Side.Right,Side.Up)]);
+			Assert.Equal(Side.Back,cube[SquarePos.Get(Side.Right,Side.Up|Side.Front)]);
+			Assert.Equal(Side.Back,cube[SquarePos.Get(Side.Right,Side.Up|Side.Back)]);
 
-			Assert.Equal(Side.Left,cube[SquarePos.Get(Side.Back,Side.Top)]);
-			Assert.Equal(Side.Left,cube[SquarePos.Get(Side.Back,Side.Top|Side.Right)]);
-			Assert.Equal(Side.Left,cube[SquarePos.Get(Side.Back,Side.Top|Side.Left)]);
+			Assert.Equal(Side.Left,cube[SquarePos.Get(Side.Back,Side.Up)]);
+			Assert.Equal(Side.Left,cube[SquarePos.Get(Side.Back,Side.Up|Side.Right)]);
+			Assert.Equal(Side.Left,cube[SquarePos.Get(Side.Back,Side.Up|Side.Left)]);
 
-			Assert.Equal(Side.Front,cube[SquarePos.Get(Side.Left,Side.Top)]);
-			Assert.Equal(Side.Front,cube[SquarePos.Get(Side.Left,Side.Top|Side.Back)]);
-			Assert.Equal(Side.Front,cube[SquarePos.Get(Side.Left,Side.Top|Side.Front)]);
+			Assert.Equal(Side.Front,cube[SquarePos.Get(Side.Left,Side.Up)]);
+			Assert.Equal(Side.Front,cube[SquarePos.Get(Side.Left,Side.Up|Side.Back)]);
+			Assert.Equal(Side.Front,cube[SquarePos.Get(Side.Left,Side.Up|Side.Front)]);
 
 			Assert.False( cube.IsSolved );
 
@@ -125,12 +130,12 @@ namespace CubeSolver {
 			
 			// 3 turns, not solved
 			for(int i=0;i<3;++i) {
-				cube.Turn(new Turn(side,Direction.Clockwise));
+				cube = cube.ApplyTurn(new Turn(side,Direction.Clockwise));
 				Assert.False( cube.IsSolved );
 			}
 
 			// 4th turn resolves it
-			cube.Turn(new Turn(side,Direction.Clockwise));
+			cube = cube.ApplyTurn(new Turn(side,Direction.Clockwise));
 			Assert.True( cube.IsSolved );
 
 		}
@@ -144,11 +149,11 @@ namespace CubeSolver {
 			Assert.True( cube.IsSolved );
 			
 			// turn -> unsolved
-			cube.Turn(new Turn(side,Direction.Clockwise));
+			cube = cube.ApplyTurn(new Turn(side,Direction.Clockwise));
 			Assert.False( cube.IsSolved );
 
 			// unturn -> resolved
-			cube.Turn(new Turn(side,Direction.CounterClockwise));
+			cube = cube.ApplyTurn(new Turn(side,Direction.CounterClockwise));
 			Assert.True( cube.IsSolved );
 
 		}
@@ -162,11 +167,11 @@ namespace CubeSolver {
 			var orig = cube.Clone();
 			
 			// turn -> unsolved
-			cube.Turn(new Turn(side,Direction.Clockwise));
+			cube = cube.ApplyTurn(new Turn(side,Direction.Clockwise));
 			Assert.False( orig.Equals(cube) );
 
 			// unturn -> resolved
-			cube.Turn(new Turn(side,Direction.CounterClockwise));
+			cube = cube.ApplyTurn(new Turn(side,Direction.CounterClockwise));
 			Assert.True( orig.Equals(cube) );
 
 		}
