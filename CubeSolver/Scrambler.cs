@@ -4,7 +4,7 @@ namespace CubeSolver {
 
 	public class Scrambler {
 
-		public void Scramble(Cube cube) {
+		public Cube Scramble(Cube cube) {
 			Random rnd = new Random();
 
 			for(int i=0;i<50;++i)
@@ -12,6 +12,7 @@ namespace CubeSolver {
 					new Turn(CubeGeometry.AllSides[rnd.Next(6)],
 					rnd.Next(2)==0 ? Direction.Clockwise:Direction.CounterClockwise
 				));
+			return cube;
 		}
 	}
 

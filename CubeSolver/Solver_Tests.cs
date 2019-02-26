@@ -15,7 +15,7 @@ namespace CubeSolver {
 
 		public static IEnumerable<object[]> EdgePositions {
 			get {
-				return CubeGeometry.GetAllEdgePositions()
+				return CubeGeometry.AllEdgePositions
 					.Select( e => new object[] { e } )
 					.ToArray();
 			}
@@ -23,7 +23,7 @@ namespace CubeSolver {
 
 		public static IEnumerable<object[]> EdgePositionPairs {
 			get {
-				var allEdgePositions = CubeGeometry.GetAllEdgePositions();
+				var allEdgePositions = CubeGeometry.AllEdgePositions;
 				foreach(var pos1 in allEdgePositions)
 					foreach(var pos2 in allEdgePositions)
 						if( !pos1.InSameSpace(pos2) )
@@ -174,6 +174,29 @@ namespace CubeSolver {
 			string s = string.Join( "", (IEnumerable<Turn>)turns );
 			int i = 0;
 
+		}
+
+		[Fact]
+		public void CanSolveCross() {
+			// Given: a scrambled cube
+//			var cube = new Scrambler().Scramble(new Cube());
+
+			var cube = new Cube()
+				.ApplyTurn(Turn.Parse("D"))
+				.ApplyTurn(Turn.Parse("F"))
+				.ApplyTurn(Turn.Parse("R"));
+
+			// When: get cross solution and apply it
+			var turns = Solver.GetCrossSolution( cube );
+			string turnString = string.Join("",(IEnumerable<Turn>)turns);
+			foreach(var turn in turns)
+				cube = cube.ApplyTurn( turn );
+
+			// Then: cross is solved
+			Assert.True( EdgeConstraint.Stationary(new Edge(Side.Front,Side.Down) ).IsMatch(cube) );
+			Assert.True( EdgeConstraint.Stationary(new Edge(Side.Right,Side.Down) ).IsMatch(cube) );
+			Assert.True( EdgeConstraint.Stationary(new Edge(Side.Back,Side.Down) ).IsMatch(cube) );
+			Assert.True( EdgeConstraint.Stationary(new Edge(Side.Left,Side.Down) ).IsMatch(cube) );
 		}
 
 		#region Long Running 3-edge cubes

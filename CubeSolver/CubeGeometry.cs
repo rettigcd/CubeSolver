@@ -30,15 +30,17 @@ namespace CubeSolver {
 		}
 
 		static Edge[] _allEdgePositions = null;
-		static public Edge[] GetAllEdgePositions() {
-			if( _allEdgePositions == null ) {
-				List<Edge> edges = new List<Edge>();
-				foreach( var face in CubeGeometry.AllSides )
-					foreach( var adj in CubeGeometry.GetClockwiseAdjacentFaces( face ) )
-						edges.Add( new Edge( face, adj ) );
-				_allEdgePositions = edges.ToArray();
+		static public Edge[] AllEdgePositions {
+			get {
+				if( _allEdgePositions == null ) {
+					List<Edge> edges = new List<Edge>();
+					foreach( var face in CubeGeometry.AllSides )
+						foreach( var adj in CubeGeometry.GetClockwiseAdjacentFaces( face ) )
+							edges.Add( new Edge( face, adj ) );
+					_allEdgePositions = edges.ToArray();
+				}
+				return _allEdgePositions;
 			}
-			 return _allEdgePositions;
 		}
 
 	}
