@@ -1,32 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CubeSolver {
 
 	static class CubeGeometry {
 
-		static public readonly Side[] AllSides = new[] { Side.Up,Side.Front,Side.Left,Side.Down,Side.Back,Side.Right };
-
-		static public Side[] AdjacentSidesOf( Side side ) {
-			Side opposite = OppositeSideOf( side );
-			return AllSides
-				.Where(s => s!=side && s!=opposite )
-				.ToArray();
-		}
+		// these are in a special order of -x,x,-y,y,-z,z
+		static public readonly Side[] AllSides = new[] { Side.Left, Side.Right, Side.Front, Side.Back, Side.Down, Side.Up, };
 
 		static public Side OppositeSideOf( Side side ) {
-			switch(side) {
-				case Side.Back: return Side.Front;
-				case Side.Front: return Side.Back;
-				case Side.Left: return Side.Right;
-				case Side.Right: return Side.Left;
-				case Side.Up: return Side.Down;
-				case Side.Down: return Side.Up;
-				default: throw new ArgumentException($"Invalid value for {nameof(side)}:{side}");
-			}
+			int index = Array.IndexOf(AllSides,side);
+			return AllSides[index ^ 1];
 		}
 
+
 		static public Side[] GetClockwiseAdjacentFaces( Side face ) {
+			// math to do generic cross product is too hard
+			// just hard code them
 			switch(face) {
 				case Side.Up:		return new [] {Side.Back,Side.Right,Side.Front,Side.Left };
 				case Side.Front:	return new [] {Side.Up,Side.Right,Side.Down,Side.Left };
@@ -36,6 +27,18 @@ namespace CubeSolver {
 				case Side.Right:	return new [] {Side.Up,Side.Back,Side.Down,Side.Front };
 				default: throw new ArgumentException("invalid side");
 			}
+		}
+
+		static Edge[] _allEdgePositions = null;
+		static public Edge[] GetAllEdgePositions() {
+			if( _allEdgePositions == null ) {
+				List<Edge> edges = new List<Edge>();
+				foreach( var face in CubeGeometry.AllSides )
+					foreach( var adj in CubeGeometry.GetClockwiseAdjacentFaces( face ) )
+						edges.Add( new Edge( face, adj ) );
+				_allEdgePositions = edges.ToArray();
+			}
+			 return _allEdgePositions;
 		}
 
 	}

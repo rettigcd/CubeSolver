@@ -13,11 +13,10 @@ namespace CubeSolver {
 		/// <summary> 
 		/// Since initially, all pieces are in their starting position,
 		/// this is both the initial location and the 'color' of the piece we are going to move. 
-		/// Note: .
 		/// </summary>
 		/// <remarks>
-		/// We are using Side to designate color. 
-		/// Instead of the top being 'White' color, the top is 'Top' color. </remarks>
+		/// We are using Side to designate color.
+		/// Instead of the top being 'White' color, the top is 'Up' color. </remarks>
 		public Edge FromColor { get; private set; }
 
 		/// <summary>

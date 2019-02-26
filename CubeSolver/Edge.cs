@@ -12,12 +12,14 @@ namespace CubeSolver {
 		public MovablePosition Pos1 => MovablePosition.Get(Side1,Side0);
 
 		/// <summary>
-		/// In same location mut may have different orientation
+		/// In same location but may have different orientation
 		/// </summary>
 		public bool InSameSpace( Edge other ) {
 			return (Side0 == other.Side0 && Side1 == other.Side1)
 				|| (Side1 == other.Side0 && Side0 == other.Side1);
 		}
+
+		public override string ToString() => Side0+":"+Side1;
 
 	}
 

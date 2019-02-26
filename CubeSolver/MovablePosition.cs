@@ -15,7 +15,7 @@ namespace CubeSolver {
 
 		static public MovablePosition[] GetMovablePositionsForSide( Side side ) {
 
-			Side[] adjacents = CubeGeometry.AdjacentSidesOf( side );
+			Side[] adjacents = CubeGeometry.GetClockwiseAdjacentFaces( side );
 
 			return new[] {
 				MovablePosition.Get(side,adjacents[0]),
@@ -52,6 +52,7 @@ namespace CubeSolver {
 			_hash = hash;
 			Index = index;
 		}
+
 		public int Index { get; private set; }
 		int _hash;
 

@@ -13,54 +13,26 @@ namespace CubeSolver {
 
 	public class Solver_Tests {
 
-		void Assert_CanMoveEdgeToBottomCross(Side side0, Side side1, int expectedNumberOfTurns) {
-			var startingPosition = new Edge(side0,side1);
-			var destination = new Edge( Side.Front, Side.Down );
-			var turns = GetStepsToPlaceCrossEdge( startingPosition, destination );
-			Assert.Equal( expectedNumberOfTurns, turns.Length );
+		public static IEnumerable<object[]> EdgePositions {
+			get {
+				return CubeGeometry.GetAllEdgePositions()
+					.Select( e => new object[] { e } )
+					.ToArray();
+			}
 		}
 
-		[Fact]
-		public void CanFindAllMovesToPlaceCrossEdge() {
-
-			// bottom row
-			Assert_CanMoveEdgeToBottomCross(Side.Front,Side.Down,0);
-			Assert_CanMoveEdgeToBottomCross(Side.Right,Side.Down,4);
-			Assert_CanMoveEdgeToBottomCross(Side.Left,Side.Down,4);
-			Assert_CanMoveEdgeToBottomCross(Side.Back,Side.Down,6);
-			Assert_CanMoveEdgeToBottomCross(Side.Down,Side.Right,2);
-			Assert_CanMoveEdgeToBottomCross(Side.Down,Side.Left,2);
-			Assert_CanMoveEdgeToBottomCross(Side.Down,Side.Back,4);
-			Assert_CanMoveEdgeToBottomCross(Side.Down,Side.Front,4);
-
-			// Middle row
-			Assert_CanMoveEdgeToBottomCross(Side.Front,Side.Right,1);
-			Assert_CanMoveEdgeToBottomCross(Side.Right,Side.Front,3);
-			Assert_CanMoveEdgeToBottomCross(Side.Front,Side.Left,1);
-			Assert_CanMoveEdgeToBottomCross(Side.Left,Side.Front,3);
-			Assert_CanMoveEdgeToBottomCross(Side.Right,Side.Back,3);
-			Assert_CanMoveEdgeToBottomCross(Side.Left,Side.Back,3);
- 			Assert_CanMoveEdgeToBottomCross(Side.Back,Side.Left,5);
-			Assert_CanMoveEdgeToBottomCross(Side.Back,Side.Right,5);
-
-			// top row
-			Assert_CanMoveEdgeToBottomCross(Side.Front,Side.Up,2);
-			Assert_CanMoveEdgeToBottomCross(Side.Up,Side.Front,4);
-			Assert_CanMoveEdgeToBottomCross(Side.Left,Side.Up,3);
-			Assert_CanMoveEdgeToBottomCross(Side.Up,Side.Left,3);
-			Assert_CanMoveEdgeToBottomCross(Side.Right,Side.Up,3);
-			Assert_CanMoveEdgeToBottomCross(Side.Up,Side.Right,3);
-			Assert_CanMoveEdgeToBottomCross(Side.Back,Side.Up,4);
-			Assert_CanMoveEdgeToBottomCross(Side.Up,Side.Back,4);
-
+		public static IEnumerable<object[]> EdgePositionPairs {
+			get {
+				var allEdgePositions = CubeGeometry.GetAllEdgePositions();
+				foreach(var pos1 in allEdgePositions)
+					foreach(var pos2 in allEdgePositions)
+						if( !pos1.InSameSpace(pos2) )
+							yield return new object[] { pos1, pos2};
+			}
 		}
 
-		[Fact(Skip ="test not finding timely solution")]
-		public void CanPlaceF2L() {
-
-			CanPlaceCornerEdgePair_FrontRightSlot( new Edge(Side.Up,Side.Back), new Corner(Side.Right,Side.Front,Side.Up) );
-
-			// Use key-hole method to bring turn count down for all but last pair...
+		public static IEnumerable<object[]> EdgeCorners {
+			get {
 
 			// corner above the slot
 			Corner[] startingCornerPositions = new [] {
@@ -70,47 +42,133 @@ namespace CubeSolver {
 			};
 			// missing corner already in slot...
 
-			Edge[] staringEdgePositions = new [] {
-				// top
-				new Edge( Side.Up, Side.Front ),
-				new Edge( Side.Up, Side.Right ),
-				new Edge( Side.Up, Side.Back ),
-				new Edge( Side.Up, Side.Left ),
-				new Edge( Side.Front, Side.Up ),
-				new Edge( Side.Right, Side.Up ),
-				new Edge( Side.Back, Side.Up ),
-				new Edge( Side.Left, Side.Up ),
-				// slot
-				new Edge( Side.Front, Side.Right ),
-				new Edge( Side.Right, Side.Front )
+				Edge[] staringEdgePositions = new [] {
+					// top
+					new Edge( Side.Up, Side.Front ),
+					new Edge( Side.Up, Side.Right ),
+					new Edge( Side.Up, Side.Back ),
+					new Edge( Side.Up, Side.Left ),
+					new Edge( Side.Front, Side.Up ),
+					new Edge( Side.Right, Side.Up ),
+					new Edge( Side.Back, Side.Up ),
+					new Edge( Side.Left, Side.Up ),
+					// slot
+					new Edge( Side.Front, Side.Right ),
+					new Edge( Side.Right, Side.Front )
+				};
 
-			};
-
-			foreach(var corner in startingCornerPositions)
-				foreach(var edge in staringEdgePositions)
-					CanPlaceCornerEdgePair_FrontRightSlot( edge, corner );
-
+				foreach(var corner in startingCornerPositions)
+					foreach(var edge in staringEdgePositions)
+						yield return new object[] { edge, corner };
+			}
 		}
 
-		void CanPlaceCornerEdgePair_FrontRightSlot( Edge edgeSource, Corner cornerSource ) {
+		[Theory(Skip = "These are data-generating methods, not really tests.")]
+		[MemberData(nameof(EdgePositions))]
+		public void CanMoveEdgeToBottomCross( Edge startingPosition ) {
+			var destination = new Edge( Side.Front, Side.Down );
+
+			var turns = Solver.GetStepsToAcheiveMatch( 6, new EdgeConstraint( startingPosition, destination ) );
+
+			string moveStr = string.Join("",(IEnumerable<Turn>)turns);
+			System.IO.File.AppendAllText("C:\\bob.txt", $"{turns.Length}\t{startingPosition}\t{moveStr}\r\n" );
+		}
+
+		[Theory(Skip = "These are data-generating methods, not really tests.")]
+		[MemberData(nameof(EdgePositions))]
+		public void CanMoveEdgeToBottomCross_WithoutDistubingCross( Edge startingPosition ) {
+			var destination = new Edge( Side.Front, Side.Down );
+
+			var otherBottomEdges = new [] {
+				new Edge( Side.Down, Side.Right ),
+				new Edge( Side.Down, Side.Left ),
+				new Edge( Side.Down, Side.Back )
+			};
+
+			var bottomEdgeStationaryConstraints = otherBottomEdges
+				.Where( e=>!e.InSameSpace(startingPosition) )
+				.Select( x=>EdgeConstraint.Stationary(x) );
+
+			var constraints = new CompoundConstraint();
+			constraints.AddRange( bottomEdgeStationaryConstraints );
+			constraints.Add( new EdgeConstraint( startingPosition, destination ) );
+
+			var turns = Solver.GetStepsToAcheiveMatch( 6, constraints );
+			string moveStr = string.Join("",(IEnumerable<Turn>)turns);
+			System.IO.File.AppendAllText("C:\\bob.txt", $"{turns.Length}\t{startingPosition}\t{moveStr}\r\n" );
+
+			Assert.True( turns.Length <= 6 );
+		}
+
+		[Theory(Skip = "These are data-generating methods, not really tests.")]
+		[MemberData(nameof(EdgePositionPairs))]
+		public void CanMove_First2Edges_ToBottomCross( Edge startingPosition1, Edge startingPosition2 ) {
+			var constraints = new CompoundConstraint();
+			constraints.Add( new EdgeConstraint( startingPosition1, new Edge( Side.Front, Side.Down ) ) );
+			constraints.Add( new EdgeConstraint( startingPosition2, new Edge( Side.Back, Side.Down ) ) );
+
+			var turns = Solver.GetStepsToAcheiveMatch( 6, constraints );
+			string moveStr = string.Join("",(IEnumerable<Turn>)turns);
+			System.IO.File.AppendAllText("C:\\bob.txt", $"{turns.Length}\t{startingPosition1}\t{startingPosition2}\t{moveStr}\r\n" );
+		}
+
+		[Theory(Skip = "These are data-generating methods, not really tests.")]
+		[MemberData(nameof(EdgePositionPairs))]
+		public void CanMove_Last2Edges_ToBottomCross( Edge startingPosition1, Edge startingPosition2 ) {
+
+			const string filename = "C:\\bob.txt";
+
+			Edge fixed1 = new Edge( Side.Left, Side.Down );
+			Edge fixed2 = new Edge( Side.Back, Side.Down );
+
+			if(    startingPosition1.InSameSpace(fixed1)
+				|| startingPosition2.InSameSpace(fixed1)
+				|| startingPosition1.InSameSpace(fixed2)
+				|| startingPosition2.InSameSpace(fixed2)
+			) {
+				System.IO.File.AppendAllText(filename, "-----\r\n" );
+				return;
+			}
+
+			var constraints = new CompoundConstraint();
+			constraints.Add( new EdgeConstraint( startingPosition1, new Edge( Side.Front, Side.Down ) ) );
+			constraints.Add( new EdgeConstraint( startingPosition2, new Edge( Side.Right, Side.Down ) ) );
+
+			constraints.Add( EdgeConstraint.Stationary( fixed1 ) );
+			constraints.Add( EdgeConstraint.Stationary( fixed2 ) );
+
+			try {
+				var turns = Solver.GetStepsToAcheiveMatch( 6, constraints );
+				string moveStr = string.Join("",(IEnumerable<Turn>)turns);
+				System.IO.File.AppendAllText(filename, $"{turns.Length}\t{startingPosition1}\t{startingPosition2}\t{moveStr}\r\n" );
+			} catch(MoveNotFoundExcpetion) {
+				System.IO.File.AppendAllText(filename, "-- No move found. -- \r\n" );
+			}
+		}
+
+		[Theory(Skip = "These are data-generating methods, not really tests.")]
+		[MemberData(nameof(EdgeCorners))]
+		//	CanPlaceCornerEdgePair_FrontRightSlot( new Edge(Side.Up,Side.Back), new Corner(Side.Right,Side.Front,Side.Up) ); // RUR'
+		//	CanPlaceCornerEdgePair_FrontRightSlot( new Edge(Side.Right,Side.Up), new Corner(Side.Back,Side.Right,Side.Up) ); // F'UF
+		public void CanPlaceCornerEdgePair_FrontRightSlot( Edge edgeSource, Corner cornerSource ) {
+
+			var constraints = new CompoundConstraint();
 
 			Edge edgeDestination = new Edge( Side.Front, Side.Right );
+				constraints.Add( new EdgeConstraint( edgeSource, edgeDestination ) );
 			Corner cornerDestination = new Corner( Side.Down, Side.Front, Side.Right );
+				constraints.Add( new CornerConstraint( cornerSource, cornerDestination ) );
 
-			CubeConstraint[] otherPairConstriants = new CubeConstraint[] {
+			constraints.AddRange( CrossConstraints() );
+
+			constraints.AddRange( new CubeConstraint[] {
 				CornerConstraint.Stationary(new Corner(Side.Down,Side.Right,Side.Back)),
 				CornerConstraint.Stationary(new Corner(Side.Down,Side.Back,Side.Left)),
 				CornerConstraint.Stationary(new Corner(Side.Down,Side.Left,Side.Front)),
 				EdgeConstraint.Stationary(new Edge(Side.Right,Side.Back)),
 				EdgeConstraint.Stationary(new Edge(Side.Back,Side.Left)),
 				EdgeConstraint.Stationary(new Edge(Side.Left,Side.Front)),
-			};
-
-			var constraints = new CompoundConstraint();
-			constraints.AddRange( CrossConstraints() );
-			constraints.AddRange( otherPairConstriants );
-			constraints.Add( new EdgeConstraint( edgeSource, edgeDestination ) );
-			constraints.Add( new CornerConstraint( cornerSource, cornerDestination ) );
+			} );
 
 			var turns = Solver.GetStepsToAcheiveMatch( 8, constraints );
 			string s = string.Join( "", (IEnumerable<Turn>)turns );
@@ -118,7 +176,37 @@ namespace CubeSolver {
 
 		}
 
-		private static IEnumerable<EdgeConstraint> CrossConstraints() {
+		#region Long Running 3-edge cubes
+
+		//public static IEnumerable<object[]> EdgePositionTriplets {
+		//	get {
+		//		var allEdgePositions = CubeGeometry.GetAllEdgePositions();
+		//		foreach(var pos1 in allEdgePositions)
+		//			foreach(var pos2 in allEdgePositions)
+		//				if( !pos1.InSameSpace(pos2) )
+		//					foreach(var pos3 in allEdgePositions)
+		//						if( !pos3.InSameSpace(pos1) && !pos3.InSameSpace(pos2) )
+		//							yield return new object[] { pos1, pos2, pos3 };
+		//	}
+		//}
+
+		//[Theory]
+		//[MemberData(nameof(EdgePositionTriplets))]
+		//public void CanMove3EdgesToBottomCross( Edge startingPosition1, Edge startingPosition2, Edge startingPosition3 ) {
+		//	var constraints = new CompoundConstraint();
+		//	constraints.Add( new EdgeConstraint( startingPosition1, new Edge( Side.Front, Side.Down ) ) );
+		//	constraints.Add( new EdgeConstraint( startingPosition2, new Edge( Side.Right, Side.Down ) ) );
+		//	constraints.Add( new EdgeConstraint( startingPosition3, new Edge( Side.Back, Side.Down ) ) );
+
+		//	Turn[] turns = Solver.GetStepsToAcheiveMatch( 6, constraints );
+		//	System.Console.WriteLine(string.Join("",(IEnumerable<Turn>)turns));
+		//}
+
+		#endregion
+
+		#region private static
+
+		static IEnumerable<EdgeConstraint> CrossConstraints() {
 			return new[] {
 				new Edge( Side.Down, Side.Right ),
 				new Edge( Side.Down, Side.Left ),
@@ -127,32 +215,7 @@ namespace CubeSolver {
 			}.Select( x => EdgeConstraint.Stationary( x ) );
 		}
 
-		Turn[] GetStepsToPlaceCrossEdge( Edge initialEdgePosition, Edge destination ) {
-
-			var bottomEdges = new [] {
-				new Edge( Side.Down, Side.Right ),
-				new Edge( Side.Down, Side.Left ),
-				new Edge( Side.Down, Side.Back )
-			};
-
-			var bottomEdgeStationaryConstraints = bottomEdges
-				.Where( e=>!e.InSameSpace(initialEdgePosition) )
-				.Select( x=>EdgeConstraint.Stationary(x) );
-
-			var constraints = new CompoundConstraint();
-			constraints.AddRange( bottomEdgeStationaryConstraints ); // unmoved
-			constraints.Add( new EdgeConstraint( initialEdgePosition, destination ) );
-
-			return Solver.GetStepsToAcheiveMatch( 6, constraints );
-		}
-
-		string GetStepsToPlaceCrossEdgeAsString( Edge initialEdgePosition, Edge destination ) =>
-			string.Join("",(IEnumerable<Turn>)GetStepsToPlaceCrossEdge(initialEdgePosition,destination));
-
-		void Assert_TurnIs(Side side, Direction dir, Turn turn ) {
-			Assert.Equal(side,turn.Side);
-			Assert.Equal(dir,turn.Direction);
-		}
+		#endregion
 
 	}
 

@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using AiSearch.OneSide;
+﻿using AiSearch.OneSide;
 
 namespace CubeSolver {
 
 	/// <summary>
-	/// An Ai 'move' that wraps a single cube 'Turn'
+	/// An AI 'move' that wraps a single cube 'Turn'
 	/// </summary>
 	class TurnMove : Move<Cube> {
 		public Turn _turn;

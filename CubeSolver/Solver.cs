@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using AiSearch.OneSide;
 
 namespace CubeSolver {
@@ -18,7 +17,7 @@ namespace CubeSolver {
 			var moveIterator = new IterativeDeepeningIterator<Cube>( moveGenerator, maxTurnCount ) { DontRepeat = true };
 
 			Node<Cube> winner = moveIterator.Iterate( new Cube() )
-				.FirstOrDefault( node => constraint.IsMatch(node.State ) );
+				.FirstOrDefault( node => constraint.IsMatch(node.State) );
 
 			if( winner == null ) throw new MoveNotFoundExcpetion();
 

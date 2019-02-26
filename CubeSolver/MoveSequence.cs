@@ -5,7 +5,9 @@ namespace CubeSolver {
 
 	public class MoveSequence {
 
-		public MoveSequence(IEnumerable<Tx> tx ) {
+		#region constructors
+
+		public MoveSequence(IEnumerable<Tx> tx) {
 			_stickerMoves = tx.ToList();
 		}
 
@@ -13,12 +15,14 @@ namespace CubeSolver {
 			_stickerMoves = new List<Tx>();
 		}
 
+		#endregion
+
 		public void Advance(Side[] original, Side[] stickers) {
 			foreach(var tx in _stickerMoves )
 				tx.Advance(original, stickers);
 		}
 
-		public MoveSequence Reverse() => new MoveSequence(_stickerMoves.Select(x=>x.Reverse() ).ToList() );
+		public MoveSequence Reverse() => new MoveSequence(_stickerMoves.Select(x=>x.Reverse()).ToList() );
 
 		// contains a list of moves that have to be made to implement this Turn/move
 		// Facilititates compressing multiple moves into a single 'composite' move (but I haven't written the code that calculates that yet)

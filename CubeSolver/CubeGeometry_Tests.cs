@@ -17,6 +17,7 @@ namespace CubeSolver {
 		[Theory]
 		[MemberData(nameof(AllSides))]
 		public void SideHas9Squares(Side side) {
+
 			var squares = MovablePosition.GetMovablePositionsForSide(side);
 			Assert.Equal(8, squares.Length);
 
@@ -26,7 +27,7 @@ namespace CubeSolver {
 			// Edges
 			MovablePosition[] edges = squares.Where( MovablePosition.IsEdge ).ToArray();
 			Assert.Equal(4, edges.Length );
-			var adjacents = CubeGeometry.AdjacentSidesOf(side);
+			var adjacents = CubeGeometry.GetClockwiseAdjacentFaces(side);
 			foreach(var adjacent in adjacents)
 				Assert.Contains(MovablePosition.Get(side,adjacent), edges);
 
@@ -45,7 +46,7 @@ namespace CubeSolver {
 		}
 
 		void Assert_CanFindClockwiseAdjacentSidesOf( Side side ) {
-			var adjacents = CubeGeometry.AdjacentSidesOf( side );
+			var adjacents = CubeGeometry.GetClockwiseAdjacentFaces( side );
 			Assert.Equal( 4, adjacents.Length );
 			var opposite = CubeGeometry.OppositeSideOf( side );
 			foreach( var adjacent in adjacents )

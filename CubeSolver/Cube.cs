@@ -6,7 +6,7 @@ namespace CubeSolver {
 	/// <summary>
 	/// Tracks the location of all48 movable sticker positions/colors.
 	/// </summary>
-	public partial class Cube : IEquatable<Cube> {
+	public class Cube : IEquatable<Cube> {
 
 		#region static 
 
