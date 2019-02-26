@@ -3,68 +3,54 @@ using System.Collections.Generic;
 
 namespace CubeSolver {
 
-	public partial class Cube {
+	public partial class Turn {
 
-		// used by Cube to manage moving the sticket positions forward (cw) and backwars(ccw)
-		class ClockwiseSequenceGroup {
+		// used by Turn to represent (sticker) Move group ofr a particular turn. (cw) and backwars(ccw)
+		class ClockwiseSequenceGroup : MoveSequence {
 
 			#region static
 
-			static public Tx[] MakeFaceEdges( Side face, Side[] adj ) {
-				SquarePos[] faceEdges = new SquarePos[4];
+			static void Append4PositionSequence( MovablePosition[] pos, List<Tx> items ) {
+				items.Add( new Tx{ To=pos[0].Index, From=pos[3].Index } );
+				items.Add( new Tx{ To=pos[1].Index, From=pos[0].Index } );
+				items.Add( new Tx{ To=pos[2].Index, From=pos[1].Index } );
+				items.Add( new Tx{ To=pos[3].Index, From=pos[2].Index } );
+			}
+
+			static MovablePosition[] MakeFaceEdges( Side face, Side[] adj ) {
+				MovablePosition[] faceEdges = new MovablePosition[4];
 				for( int i = 0; i < 4; ++i )
-					faceEdges[i] = SquarePos.Get( face, adj[i] );
-				return SquarePositionSequence.BuildTx(faceEdges);
+					faceEdges[i] = MovablePosition.Get( face, adj[i] );
+				return faceEdges;
 			}
 
-			static public Tx[] MakeEdges( Side face, Side[] adj ) {
-				SquarePos[] edges = new SquarePos[4];
+			static MovablePosition[] MakeEdges( Side face, Side[] adj ) {
+				MovablePosition[] edges = new MovablePosition[4];
 				for( int i = 0; i < 4; ++i )
-					edges[i] = SquarePos.Get( adj[i], face );
-				return SquarePositionSequence.BuildTx(edges);
+					edges[i] = MovablePosition.Get( adj[i], face );
+				return edges;
 			}
 
-			static public Tx[] MakeFaceCorners( Side face, Side[] adj ) {
-				SquarePos[] faceCorners = new SquarePos[4];
+			static MovablePosition[] MakeFaceCorners( Side face, Side[] adj ) {
+				MovablePosition[] faceCorners = new MovablePosition[4];
 				for( int i = 0; i < 4; ++i )
-					faceCorners[i] = SquarePos.Get( face, adj[i] | adj[(i + 1) % 4] );
-				return SquarePositionSequence.BuildTx(faceCorners);
+					faceCorners[i] = MovablePosition.Get( face, adj[i] | adj[(i + 1) % 4] );
+				return faceCorners;
 			}
 
-			static public Tx[] MakeRightCorners( Side face, Side[] adj ) {
-				SquarePos[] rightCorners = new SquarePos[4];
+			static MovablePosition[] MakeRightCorners( Side face, Side[] adj ) {
+				MovablePosition[] rightCorners = new MovablePosition[4];
 				for( int i = 0; i < 4; ++i )
-					rightCorners[i] = SquarePos.Get( adj[i], face | adj[(i + 1) % 4] );
-				return SquarePositionSequence.BuildTx(rightCorners);
+					rightCorners[i] = MovablePosition.Get( adj[i], face | adj[(i + 1) % 4] );
+				return rightCorners;
 			}
 
-			static public Tx[] MakeLeftCorners( Side face, Side[] adj ) {
-				SquarePos[] leftCorners = new SquarePos[4];
+			static MovablePosition[] MakeLeftCorners( Side face, Side[] adj ) {
+				MovablePosition[] leftCorners = new MovablePosition[4];
 				for( int i = 0; i < 4; ++i )
-					leftCorners[i] = SquarePos.Get( adj[i], face | adj[(i + 3) % 4] );
-				return SquarePositionSequence.BuildTx(leftCorners);
+					leftCorners[i] = MovablePosition.Get( adj[i], face | adj[(i + 3) % 4] );
+				return leftCorners;
 			}
-
-			#endregion
-
-			public ClockwiseSequenceGroup( Side face ) {
-
-				Side[] clockwiseAdjacent = GetClockwiseAdjacent( face );
-
-				_stickerMoves = new List<Tx>();
-				_stickerMoves.AddRange( MakeLeftCorners ( face, clockwiseAdjacent ) );
-				_stickerMoves.AddRange( MakeRightCorners( face, clockwiseAdjacent ) );
-				_stickerMoves.AddRange( MakeFaceCorners ( face, clockwiseAdjacent ) );
-				_stickerMoves.AddRange( MakeEdges       ( face, clockwiseAdjacent ) );
-				_stickerMoves.AddRange( MakeFaceEdges   ( face, clockwiseAdjacent ) );
-
-			}
-
-			// contains a list of moves that have to be made to implement this Turn/move
-			// Facilititates compressing multiple moves into a single 'composite' move (but I haven't written the code that calculates that yet)
-			// Can use Composite moves to apply a sequence of moves and skip directly to the end without doing the intermediary steps
-			// ! any Tx in a composite move where the from and to are the same, can be removed.
-			List<Tx> _stickerMoves;
 
 			static Side[] GetClockwiseAdjacent( Side face ) {
 				switch(face) {
@@ -78,18 +64,23 @@ namespace CubeSolver {
 				}
 			}
 
-			public void Advance(Side[] original, Side[] stickers) {
-				foreach(var tx in _stickerMoves )
-					tx.Advance(original, stickers);
-			}
+			#endregion
 
-			public void Retreat(Side[] original, Side[] stickers) {
-				foreach(var tx in _stickerMoves )
-					tx.Retreat(original, stickers);
+			public ClockwiseSequenceGroup( Side face ) {
+
+				Side[] clockwiseAdjacent = GetClockwiseAdjacent( face );
+
+				Append4PositionSequence( MakeLeftCorners ( face, clockwiseAdjacent), _stickerMoves );
+				Append4PositionSequence( MakeRightCorners( face, clockwiseAdjacent), _stickerMoves );
+				Append4PositionSequence( MakeFaceCorners ( face, clockwiseAdjacent), _stickerMoves );
+				Append4PositionSequence( MakeEdges       ( face, clockwiseAdjacent), _stickerMoves );
+				Append4PositionSequence( MakeFaceEdges   ( face, clockwiseAdjacent), _stickerMoves );
+
 			}
 
 		}
 
 	}
+
 
 }

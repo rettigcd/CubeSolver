@@ -1,11 +1,11 @@
 ﻿
 namespace CubeSolver {
 
-	public class EdgeMatch : CubeMatch {
+	public class EdgeConstraint : CubeConstraint {
 
-		static public EdgeMatch Stationary( Edge edge ) => new EdgeMatch( edge, edge );
+		static public EdgeConstraint Stationary( Edge edge ) => new EdgeConstraint( edge, edge );
 
-		public EdgeMatch(Edge fromColor, Edge toLocation) {
+		public EdgeConstraint(Edge fromColor, Edge toLocation) {
 			this.FromColor = fromColor;
 			this.ToLocation = toLocation;
 		}
