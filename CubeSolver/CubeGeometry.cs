@@ -26,6 +26,18 @@ namespace CubeSolver {
 			}
 		}
 
+		static public Side[] GetClockwiseAdjacentFaces( Side face ) {
+			switch(face) {
+				case Side.Up:		return new [] {Side.Back,Side.Right,Side.Front,Side.Left };
+				case Side.Front:	return new [] {Side.Up,Side.Right,Side.Down,Side.Left };
+				case Side.Down:		return new [] {Side.Front,Side.Right,Side.Back,Side.Left };
+				case Side.Back:		return new [] {Side.Up,Side.Left,Side.Down,Side.Right };
+				case Side.Left:		return new [] {Side.Up,Side.Front,Side.Down,Side.Back };
+				case Side.Right:	return new [] {Side.Up,Side.Back,Side.Down,Side.Front };
+				default: throw new ArgumentException("invalid side");
+			}
+		}
+
 	}
 
 
