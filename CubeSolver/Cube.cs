@@ -43,10 +43,7 @@ namespace CubeSolver {
 			set { _stickers[pos.Index] = value; }
 		}
 
-		public Cube Apply( IHaveMoveSequence turn ) {
-			var moveSequence = turn.GetMoveSequence();
-			return ApplyMoveSequence( moveSequence );
-		}
+		public Cube Apply( IHaveMoveSequence turn ) => ApplyMoveSequence( turn.GetMoveSequence() );
 
 		public Cube ApplyMoveSequence( StickerMoveGroup moveSequence ) {
 			var child = Clone();

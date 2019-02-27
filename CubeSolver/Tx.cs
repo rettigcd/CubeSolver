@@ -7,6 +7,7 @@ namespace CubeSolver {
 		public int To;
 		public void Advance( Side[] stickerSource, Side[] stickerDestination ) { stickerDestination[To] = stickerSource[From]; }
 		public Tx Reverse() => new Tx { From = To, To = From};
+		public override string ToString() => $"{From}=>{To}";
 	}
 
 }
