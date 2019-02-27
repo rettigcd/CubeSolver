@@ -4,7 +4,7 @@ namespace CubeSolver {
 	public partial class Turn {
 
 		// used by Turn to represent (sticker) Move group ofr a particular turn. (cw) and backwars(ccw)
-		class ClockwiseSequenceGroup : MoveSequence {
+		class ClockwiseSequenceGroup : StickerMoveGroup {
 
 			public ClockwiseSequenceGroup( Side face ) {
 

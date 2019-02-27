@@ -7,8 +7,20 @@ namespace CubeSolver {
 
 		#region static 
 
-		static Dictionary<Side,MoveSequence> _clockwiseTurnGroupCache;        // holds 6 CW moves
-		static Dictionary<Side,MoveSequence> _counterclockwiseTurnGroupCache; // holds 6 CCW moves
+		static readonly public Turn[] AllPossibleMoves;
+
+		static Dictionary<Side,StickerMoveGroup> _clockwiseTurnGroupCache;        // holds 6 CW moves
+		static Dictionary<Side,StickerMoveGroup> _counterclockwiseTurnGroupCache; // holds 6 CCW moves
+
+		static Turn[] BuildAllTurns() {
+			// Build all possible single turns
+			var allPossibleTurns = new List<Turn>();
+			foreach(var side in CubeGeometry.AllSides) {
+				allPossibleTurns.Add( new Turn( side, Direction.Clockwise ) );
+				allPossibleTurns.Add( new Turn( side, Direction.CounterClockwise ) );
+			}
+			return allPossibleTurns.ToArray();
+		}
 
 		static string GetSideSymbol(Side side) {
 			switch(side) {
@@ -22,37 +34,42 @@ namespace CubeSolver {
 			}
 		}
 
-		static Side ParseSideSymbol(string s) {
-			switch(s[0]) {
+		static Side ParseSideSymbol(char k) {
+			switch(k) {
 				case 'U': return Side.Up;
 				case 'D': return Side.Down;
 				case 'L': return Side.Left;
 				case 'R': return Side.Right;
 				case 'F': return Side.Front;
 				case 'B': return Side.Back;
-				default: throw new ArgumentException($"Invalid Side {s}.");
+				default: throw new ArgumentException($"Invalid Side {k}.");
 			}
 		}
 
-		static Direction ParseDirection(string s) {
-			switch(s.Length) {
-				case 1: return Direction.Clockwise;
-				case 2: return Direction.CounterClockwise;
-				default: throw new ArgumentException("This lazy parsing method assumes 1-charager strings are CW and 2-character strings are CCW");
+		static Direction ParseDirection(char k) {
+			switch(k) {
+				case '\'': return Direction.CounterClockwise;
+				//case '2': return Direction.;
+				default: return Direction.Clockwise; // in case the next character in a series is passed in.
 			}
 		}
+
+		static public Turn Parse(string s, int index=0) =>new Turn( 
+			ParseSideSymbol(s[index]), 
+			index+1<s.Length ? ParseDirection(s[index+1]) : Direction.Clockwise
+		);
 
 		static Turn() {
-			_clockwiseTurnGroupCache = new Dictionary<Side, MoveSequence>();
-			_counterclockwiseTurnGroupCache = new Dictionary<Side, MoveSequence>();
+			_clockwiseTurnGroupCache = new Dictionary<Side, StickerMoveGroup>();
+			_counterclockwiseTurnGroupCache = new Dictionary<Side, StickerMoveGroup>();
 			foreach(var side in CubeGeometry.AllSides) {
 				var sequence = new ClockwiseSequenceGroup(side);
 				_clockwiseTurnGroupCache.Add(side,sequence);
 				_counterclockwiseTurnGroupCache.Add(side,sequence.Reverse());
 			}
-		}
 
-		static public Turn Parse(string s) =>new Turn( ParseSideSymbol(s), ParseDirection(s) );
+			AllPossibleMoves = BuildAllTurns();
+		}
 
 		#endregion
 
@@ -68,13 +85,28 @@ namespace CubeSolver {
 
 		#endregion
 
-		public MoveSequence GetMoveSequence() => Direction == Direction.Clockwise 
+		public StickerMoveGroup GetMoveSequence() => Direction == Direction.Clockwise 
 			? _clockwiseTurnGroupCache[Side] 
 			: _counterclockwiseTurnGroupCache[Side];
 
 		public override string ToString() => Direction == Direction.Clockwise ? SideSymbol : SideSymbol + "'";
 
 		string SideSymbol => GetSideSymbol( Side );
+
+		#region GetHashcode / equal
+
+		public override int GetHashCode() {
+			return Side.GetHashCode() *17 + Direction.GetHashCode();
+		}
+
+		public override bool Equals( object obj ) {
+			Turn other = obj as Turn;
+			return !Object.ReferenceEquals(other,null)
+				&& Side == other.Side
+				&& Direction == other.Direction;
+		}
+
+		#endregion
 
 	}
 

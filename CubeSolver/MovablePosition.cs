@@ -36,15 +36,20 @@ namespace CubeSolver {
 
 			int hash = CalcHash(face,coord);
 
-			// Find Existing
-			if( _positionLookupByFaceCoordHash.ContainsKey(hash) ) return _positionLookupByFaceCoordHash[hash];
+			lock(locker){ // make this part thread safe so unit tests can run in parrallel
 
-			// Add new
-			if( _positionLookupByFaceCoordHash.Count >= 48 ) throw new Exception("Houston we have a problem. We should never try to add more than 48 positions.");
-			var pos = new MovablePosition( face, coord, hash, _positionLookupByFaceCoordHash.Count);
-			_positionLookupByFaceCoordHash.Add(hash,pos);
-			return pos;
+				// Find Existing
+				if( _positionLookupByFaceCoordHash.ContainsKey(hash) ) return _positionLookupByFaceCoordHash[hash];
+
+				// Add new
+				if( _positionLookupByFaceCoordHash.Count >= 48 ) throw new Exception("Houston we have a problem. We should never try to add more than 48 positions.");
+				var pos = new MovablePosition( face, coord, hash, _positionLookupByFaceCoordHash.Count);
+				_positionLookupByFaceCoordHash.Add(hash,pos);
+				return pos;
+			}
 		}
+
+		static object locker = new object(); 
 
 		MovablePosition(Side face, Side coord, int hash, int index) {
 			Face =face;

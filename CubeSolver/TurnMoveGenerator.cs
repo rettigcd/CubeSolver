@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using AiSearch.OneSide;
 
 namespace CubeSolver {
@@ -8,17 +9,12 @@ namespace CubeSolver {
 	/// </summary>
 	class TurnMoveGenerator : MoveGenerator<Cube> {
 
-		static readonly TurnMove[] AllPossibleMoves;
+		static public readonly TurnMove[] AllPossibleMoves;
 
 		static TurnMoveGenerator() {
-
-			// Build all possible single turns
-			var allPossibleTurns = new List<TurnMove>();
-			foreach(var side in CubeGeometry.AllSides) {
-				allPossibleTurns.Add( new TurnMove( new Turn(side,Direction.Clockwise) ) );
-				allPossibleTurns.Add( new TurnMove( new Turn(side,Direction.CounterClockwise) ) );
-			}
-			AllPossibleMoves = allPossibleTurns.ToArray();
+			AllPossibleMoves = Turn.AllPossibleMoves
+				.Select( x => new TurnMove( x ) )
+				.ToArray();
 		}
 
 		public IEnumerable<Move<Cube>> GetMoves( Cube s ) => AllPossibleMoves;

@@ -4,6 +4,11 @@ using System.Linq;
 using AiSearch.OneSide;
 using Xunit;
 
+
+// create 2-turn, dis allow duplicate turning
+// turn sequence
+// remove repeat
+
 namespace CubeSolver {
 
 	// There are approximately:
@@ -171,26 +176,23 @@ namespace CubeSolver {
 			} );
 
 			var turns = Solver.GetStepsToAcheiveMatch( 8, constraints );
-			string s = string.Join( "", (IEnumerable<Turn>)turns );
-			int i = 0;
+//			string s = string.Join( "", (IEnumerable<Turn>)turns );
 
 		}
 
-		[Fact]
-		public void CanSolveCross() {
-			// Given: a scrambled cube
-//			var cube = new Scrambler().Scramble(new Cube());
+		[Theory]
+		[InlineData("DFR")]
+		[InlineData("DFRB")]
+		[InlineData("RL'FFR'L")]
+		[InlineData("RLUDDL'RRBDBBU")]
+		public void CanSolveCross(string mixItUpMove) {
 
-			var cube = new Cube()
-				.ApplyTurn(Turn.Parse("D"))
-				.ApplyTurn(Turn.Parse("F"))
-				.ApplyTurn(Turn.Parse("R"));
+			var mixItUpTurns = TurnSequence.Parse(mixItUpMove);
+			var cube = mixItUpTurns.TurnCube( new Cube() );
 
 			// When: get cross solution and apply it
 			var turns = Solver.GetCrossSolution( cube );
-			string turnString = string.Join("",(IEnumerable<Turn>)turns);
-			foreach(var turn in turns)
-				cube = cube.ApplyTurn( turn );
+			cube = turns.TurnCube( cube );
 
 			// Then: cross is solved
 			Assert.True( EdgeConstraint.Stationary(new Edge(Side.Front,Side.Down) ).IsMatch(cube) );

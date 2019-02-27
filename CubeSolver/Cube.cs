@@ -48,7 +48,7 @@ namespace CubeSolver {
 			return ApplyMoveSequence( moveSequence );
 		}
 
-		public Cube ApplyMoveSequence( MoveSequence moveSequence ) {
+		public Cube ApplyMoveSequence( StickerMoveGroup moveSequence ) {
 			var child = Clone();
 			moveSequence.Advance( _stickers, child._stickers );
 			return child;

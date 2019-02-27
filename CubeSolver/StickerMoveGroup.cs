@@ -3,15 +3,15 @@ using System.Linq;
 
 namespace CubeSolver {
 
-	public class MoveSequence {
+	public class StickerMoveGroup {
 
 		#region constructors
 
-		public MoveSequence(IEnumerable<Tx> tx) {
+		public StickerMoveGroup(IEnumerable<Tx> tx) {
 			_stickerMoves = tx.ToList();
 		}
 
-		protected MoveSequence() {
+		protected StickerMoveGroup() {
 			_stickerMoves = new List<Tx>();
 		}
 
@@ -22,7 +22,7 @@ namespace CubeSolver {
 				tx.Advance(original, stickers);
 		}
 
-		public MoveSequence Reverse() => new MoveSequence(_stickerMoves.Select(x=>x.Reverse()).ToList() );
+		public StickerMoveGroup Reverse() => new StickerMoveGroup(_stickerMoves.Select(x=>x.Reverse()).ToList() );
 
 		// contains a list of moves that have to be made to implement this Turn/move
 		// Facilititates compressing multiple moves into a single 'composite' move (but I haven't written the code that calculates that yet)
