@@ -8,7 +8,7 @@ namespace CubeSolver {
 		public static StickerMoveGroup CalculateMultiMoveSequence( IEnumerable<StickerMoveGroup> moves ) {
 			// allocate space to track changes
 			int[] cur = new int[48];
-			int[] dst = new int[48];
+			int[] dst = new int[48]; // holds values while in transit
 
 			for( int i = 0; i < 48; ++i ) cur[i] = i; // init
 
@@ -20,11 +20,11 @@ namespace CubeSolver {
 				var tmp = dst; dst = cur; cur = tmp;
 			}
 
-			List<Tx> resultMoves = new List<Tx>();
-			for( int i = 0; i < 48; ++i )
-				if( cur[i] != i )
-					resultMoves.Add( new CubeSolver.Tx { From = cur[i], To = i } );
-			return new StickerMoveGroup( resultMoves );
+			var stickerMoves = Enumerable.Range(0,48)
+				.Where(i=>cur[i]!=i) // stickers moved
+				.Select(i=>new Tx { From = cur[i], To = i } );
+			return new StickerMoveGroup( stickerMoves );
+
 		}
 
 		#region constructors

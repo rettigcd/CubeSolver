@@ -1,7 +1,7 @@
 ﻿
 namespace CubeSolver {
 
-	// Advances a ticker from From to To.
+	// Advances a sticker from From to To.
 	public struct Tx {
 		public int From;
 		public int To;

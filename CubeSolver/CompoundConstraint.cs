@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace CubeSolver {
 
+	/// <summary>
+	/// IsMatch if all its parts are a match.
+	/// </summary>
 	public class CompoundConstraint : CubeConstraint {
 
 		#region constructors

@@ -161,7 +161,7 @@ namespace CubeSolver {
 
 		[Fact]
 		public void ToStringParseRoundTrip_AllPossibleTurns() {
-			foreach(var turn in Turn.AllPossibleTurns) {
+			foreach(var turn in Turn.BuildAllTurns()) {
 				string text = turn.ToString();
 				var copy = Turn.Parse(text);
 				Assert.Equal(turn,copy);

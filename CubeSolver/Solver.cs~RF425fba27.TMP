@@ -7,6 +7,8 @@ namespace CubeSolver {
 
 	public class Solver {
 
+		static readonly TurnMoveGenerator _moveGenerator = new TurnMoveGenerator();
+
 		static public TurnSequence GetCrossSolution( Cube cube ) {
 
 			// Try all 4 edge options to find which is shortest
@@ -15,10 +17,6 @@ namespace CubeSolver {
 				.OrderBy(x=>x._turns.Length)
 				.First();
 		}
-
-		// while (unsolved) 
-			// while(at least 1 pair in top), push into slot
-			// if(unsolved) push pair into top
 
 		static TurnSequence GetCrossSolution_Inner( Cube cube, int i ) {
 			var bottomEdges = new[] {
@@ -53,8 +51,6 @@ namespace CubeSolver {
 				FindEdgeAndSolveIt( cube, remainingEdge3 )
 			) );
 		}
-
-		static readonly TurnMoveGenerator _moveGenerator = new TurnMoveGenerator();
 
 		/// <remarks>
 		/// Starts with a solved cube and moves the desired cubies into the constraint. (essentially unsolving it but finding the correct moves)

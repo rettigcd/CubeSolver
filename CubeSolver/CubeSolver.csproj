@@ -70,6 +70,7 @@
     <Compile Include="CubeConstraint.cs" />
     <Compile Include="CubeGeometry.cs" />
     <Compile Include="DataGenerating_Tests.cs" />
+    <Compile Include="IHaveMoveSequence.cs" />
     <Compile Include="Rotation.cs" />
     <Compile Include="Edge.cs" />
     <Compile Include="EdgeConstraint.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="TurnMoveGenerator.cs" />
     <Compile Include="TurnMove.cs" />
     <Compile Include="TurnSequence.cs" />
+    <Compile Include="TurnText.cs" />
     <Compile Include="Turn_Tests.cs" />
     <Compile Include="Tx.cs" />
   </ItemGroup>

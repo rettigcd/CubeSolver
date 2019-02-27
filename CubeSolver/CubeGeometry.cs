@@ -14,7 +14,6 @@ namespace CubeSolver {
 			return AllSides[index ^ 1];
 		}
 
-
 		static public Side[] GetClockwiseAdjacentFaces( Side face ) {
 			// math to do generic cross product is too hard
 			// just hard code them

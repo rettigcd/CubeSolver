@@ -9,20 +9,20 @@ namespace CubeSolver {
 	/// </summary>
 	class TurnMoveGenerator : NodeMoveGenerator<Cube> {
 
-		static public readonly TurnMove[] AllPossibleTurns;
+		static public readonly TurnMove[] AllPossibleTurnMoves;
 
 		static TurnMoveGenerator() {
-			AllPossibleTurns = Turn.AllPossibleTurns
+			AllPossibleTurnMoves = Turn.BuildAllTurns()
 				.Select( x => new TurnMove( x ) )
 				.ToArray();
 		}
 
 		public IEnumerable<Move<Cube>> GetMoves( Node<Cube> s ) {
 			if( s.Move == null )
-				return AllPossibleTurns;
+				return AllPossibleTurnMoves;
 
 			Side previousTurnSide = ((TurnMove)s.Move)._turn.Side;
-			return AllPossibleTurns
+			return AllPossibleTurnMoves
 				.Where(turn => turn._turn.Side != previousTurnSide );
 		}
 

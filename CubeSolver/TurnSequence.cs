@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace CubeSolver {
@@ -7,19 +6,7 @@ namespace CubeSolver {
 	public class TurnSequence : IHaveMoveSequence {
 
 		public TurnSequence(Turn[] turns ) {
-			
-			_turns = CleanUpSequence( turns )
-				.ToArray();
-
-		}
-
-		static bool DirectionsCancel(Rotation d1,Rotation d2 ) {
-			switch(d1) {
-				case Rotation.Clockwise: return d2 == Rotation.CounterClockwise;
-				case Rotation.CounterClockwise: return d2 == Rotation.Clockwise;
-				case Rotation.Twice: return d2 == Rotation.Twice;
-				default: return false;
-			}
+			_turns = CleanUpSequence( turns );
 		}
 
 		static public TurnSequence Parse(string s ) {
@@ -40,7 +27,7 @@ namespace CubeSolver {
 
 		public Turn[] _turns;
 
-		static IEnumerable<Turn> CleanUpSequence( IEnumerable<Turn> src ) {
+		static Turn[] CleanUpSequence( IEnumerable<Turn> src ) {
 			List<Turn> orig = src.ToList();
 			var result = CleanUpSequenceOnePass(orig);
 			// make multiple passes so that void created by removing moves
@@ -49,7 +36,7 @@ namespace CubeSolver {
 				orig = result;
 				result = CleanUpSequenceOnePass(orig);
 			}
-			return result;
+			return result.ToArray();
 		}
 
 		static List<Turn> CleanUpSequenceOnePass( List<Turn> src ) {
@@ -79,11 +66,6 @@ namespace CubeSolver {
 		static Rotation AddDirections(Rotation d1,Rotation d2) {
 			int i1 = (int)d1, i2 = (int)d2;
 			return (Rotation)((i1+i2)%4);
-		}
-
-		static bool CancelEachOtherOut( Turn t1, Turn t2 ) {
-			return t1.Side == t2.Side 
-				&& DirectionsCancel(t1.Direction,t2.Direction);
 		}
 
 	}
