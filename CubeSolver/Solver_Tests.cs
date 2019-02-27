@@ -79,11 +79,11 @@ namespace CubeSolver {
 		public void CanSolveCross(string mixItUpMove) {
 
 			var mixItUpTurns = TurnSequence.Parse(mixItUpMove);
-			var cube = mixItUpTurns.TurnCube( new Cube() );
+			var cube = new Cube().Apply(mixItUpTurns);
 
 			// When: get cross solution and apply it
 			var solution = Solver.GetCrossSolution( cube );
-			cube = solution.TurnCube( cube );
+			cube = cube.Apply(solution);
 
 			// Then: cross is solved
 			Assert.True( EdgeConstraint.Stationary(new Edge(Side.Front,Side.Down) ).IsMatch(cube) );

@@ -43,7 +43,7 @@ namespace CubeSolver {
 			set { _stickers[pos.Index] = value; }
 		}
 
-		public Cube ApplyTurn( Turn turn ) {
+		public Cube Apply( IHaveMoveSequence turn ) {
 			var moveSequence = turn.GetMoveSequence();
 			return ApplyMoveSequence( moveSequence );
 		}

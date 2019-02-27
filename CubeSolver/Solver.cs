@@ -37,7 +37,7 @@ namespace CubeSolver {
 
 			var move1Turns = GetStepsToAcheiveMatch(6, move1Constraints);
 
-			Cube temp = move1Turns.TurnCube( cube );
+			Cube temp = cube.Apply( move1Turns );
 
 			// Find 2nd 2 cubes
 			var backDown = CubeGeometry.AllEdgePositions.First(edge => temp[ edge.Pos0 ] == Side.Back && temp[ edge.Pos1 ] == Side.Down );

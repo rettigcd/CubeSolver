@@ -18,7 +18,7 @@ namespace CubeSolver {
 			var cube = new Cube();
 			Assert_IsSolved( cube );
 
-			cube = cube.ApplyTurn(Turn.Parse("U") );
+			cube = cube.Apply(Turn.Parse("U") );
 
 			Assert.Equal(Side.Right,cube[MovablePosition.Get(Side.Front,Side.Up)]);
 			Assert.Equal(Side.Right,cube[MovablePosition.Get(Side.Front,Side.Up|Side.Left)]);
@@ -50,12 +50,12 @@ namespace CubeSolver {
 			
 			// 3 turns, not solved
 			for(int i=0;i<3;++i) {
-				cube = cube.ApplyTurn(new Turn(side,Rotation.Clockwise));
+				cube = cube.Apply(new Turn(side,Rotation.Clockwise));
 				Assert.False( cube.IsSolved );
 			}
 
 			// 4th turn resolves it
-			cube = cube.ApplyTurn(new Turn(side,Rotation.Clockwise));
+			cube = cube.Apply(new Turn(side,Rotation.Clockwise));
 			Assert.True( cube.IsSolved );
 
 		}
@@ -69,11 +69,11 @@ namespace CubeSolver {
 			Assert.True( cube.IsSolved );
 			
 			// turn -> unsolved
-			cube = cube.ApplyTurn(new Turn(side,Rotation.Clockwise));
+			cube = cube.Apply(new Turn(side,Rotation.Clockwise));
 			Assert.False( cube.IsSolved );
 
 			// unturn -> resolved
-			cube = cube.ApplyTurn(new Turn(side,Rotation.CounterClockwise));
+			cube = cube.Apply(new Turn(side,Rotation.CounterClockwise));
 			Assert.True( cube.IsSolved );
 
 		}
@@ -89,11 +89,11 @@ namespace CubeSolver {
 			// turn -> unsolved
 			Turn turn = new Turn(side,Rotation.Twice);
 			var x = turn.GetMoveSequence();
-			cube = cube.ApplyTurn( turn );
+			cube = cube.Apply( turn );
 			Assert.False( cube.IsSolved );
 
 			// unturn -> resolved
-			cube = cube.ApplyTurn( turn );
+			cube = cube.Apply( turn );
 			Assert.True( cube.IsSolved );
 
 		}
@@ -108,11 +108,11 @@ namespace CubeSolver {
 			var orig = cube.Clone();
 			
 			// turn -> unsolved
-			cube = cube.ApplyTurn(new Turn(side,Rotation.Clockwise));
+			cube = cube.Apply(new Turn(side,Rotation.Clockwise));
 			Assert.False( orig.Equals(cube) );
 
 			// unturn -> resolved
-			cube = cube.ApplyTurn(new Turn(side,Rotation.CounterClockwise));
+			cube = cube.Apply(new Turn(side,Rotation.CounterClockwise));
 			Assert.True( orig.Equals(cube) );
 
 		}

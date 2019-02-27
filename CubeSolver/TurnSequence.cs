@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CubeSolver {
 
-	public class TurnSequence {
+	public class TurnSequence : IHaveMoveSequence {
 
 		public TurnSequence(Turn[] turns ) {
 			
@@ -31,10 +32,8 @@ namespace CubeSolver {
 			return new TurnSequence( items.ToArray() );
 		}
 
-		public Cube TurnCube( Cube cube ) {
-			foreach(var turn in _turns)
-				cube = cube.ApplyTurn(turn);
-			return cube;
+		public StickerMoveGroup GetMoveSequence() {
+			return StickerMoveGroup.CalculateMultiMoveSequence( _turns.Select(turn=>turn.GetMoveSequence() ) );
 		}
 
 		public override string ToString() => string.Join("",(IEnumerable<Turn>)_turns);

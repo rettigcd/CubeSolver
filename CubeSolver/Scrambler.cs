@@ -8,7 +8,7 @@ namespace CubeSolver {
 			Random rnd = new Random();
 
 			for(int i=0;i<50;++i)
-				cube = cube.ApplyTurn(
+				cube = cube.Apply(
 					new Turn(CubeGeometry.AllSides[rnd.Next(6)],
 					rnd.Next(2)==0 ? Rotation.Clockwise:Rotation.CounterClockwise
 				));

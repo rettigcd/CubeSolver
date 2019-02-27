@@ -3,7 +3,11 @@ using System.Collections.Generic;
 
 namespace CubeSolver {
 
-	public partial class Turn {
+	public interface IHaveMoveSequence {
+		StickerMoveGroup GetMoveSequence();
+	}
+
+	public partial class Turn :IHaveMoveSequence {
 
 		#region static 
 
@@ -78,7 +82,7 @@ namespace CubeSolver {
 				var sequence = new ClockwiseSequenceGroup(side);
 				_clockwiseTurnGroupCache.Add(side,sequence);
 				_counterclockwiseTurnGroupCache.Add(side,sequence.Reverse());
-				_twiceTurnGroupCache.Add(side,sequence.Twice());
+				_twiceTurnGroupCache.Add(side, StickerMoveGroup.CalculateMultiMoveSequence( new[] { sequence, sequence } ) );
 			}
 
 			AllPossibleTurns = BuildAllTurns();

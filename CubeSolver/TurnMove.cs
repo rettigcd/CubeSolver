@@ -9,7 +9,7 @@ namespace CubeSolver {
 		public Turn _turn;
 		public TurnMove( Turn turn ) { _turn = turn; }
 		public string HumanReadable => _turn.ToString();
-		public Cube GenerateChild( Cube state ) => state.ApplyTurn( _turn );
+		public Cube GenerateChild( Cube state ) => state.Apply( _turn );
 
 	}
 
