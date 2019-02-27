@@ -1,6 +1,4 @@
 ﻿using Xunit;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace CubeSolver {
 
@@ -82,6 +80,27 @@ namespace CubeSolver {
 
 		[Theory]
 		[MemberData(nameof(AllSides))]
+		public void TurningASideTwiceTwice_ReSolvesIt(Side side) {
+
+			// Initially solved
+			var cube = new Cube();
+			Assert.True( cube.IsSolved );
+			
+			// turn -> unsolved
+			Turn turn = new Turn(side,Direction.Twice);
+			var x = turn.GetMoveSequence();
+			cube = cube.ApplyTurn( turn );
+			Assert.False( cube.IsSolved );
+
+			// unturn -> resolved
+			cube = cube.ApplyTurn( turn );
+			Assert.True( cube.IsSolved );
+
+		}
+
+
+		[Theory]
+		[MemberData(nameof(AllSides))]
 		public void TurningSideOfScrambledCube(Side side) {
 
 			// Initially solved
@@ -136,6 +155,15 @@ namespace CubeSolver {
 			var positions = MovablePosition.GetMovablePositionsForSide( side );
 			foreach( var pos in positions )
 				Assert.Equal( side, cube[pos] );
+		}
+
+		[Fact]
+		public void ToStringParseRoundTrip_AllPossibleTurns() {
+			foreach(var turn in Turn.AllPossibleTurns) {
+				string text = turn.ToString();
+				var copy = Turn.Parse(text);
+				Assert.Equal(turn,copy);
+			}
 		}
 
 	}

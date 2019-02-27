@@ -6,27 +6,22 @@ namespace CubeSolver {
 	public class TurnSequence {
 
 		public TurnSequence(Turn[] turns ) {
-			var items = turns.ToList();
-			int i=0;
-			while(i<items.Count-1) {
-				while( CancelEachOtherOut( items[i], items[i+1] )) {
-					items.RemoveAt(i);
-					items.RemoveAt(i);
-					if(i>0) --i;
-				}
-				++i;
-			}
-			_turns = items.ToArray();
+			
+			_turns = CleanUpSequence( turns )
+				.ToArray();
 
 		}
+
 		static bool CancelEachOtherOut( Turn t1, Turn t2 ) {
 			return t1.Side == t2.Side 
 				&& DirectionsCancel(t1.Direction,t2.Direction);
 		}
+
 		static bool DirectionsCancel(Direction d1,Direction d2 ) {
 			switch(d1) {
 				case Direction.Clockwise: return d2 == Direction.CounterClockwise;
 				case Direction.CounterClockwise: return d2 == Direction.Clockwise;
+				case Direction.Twice: return d2 == Direction.Twice;
 				default: return false;
 			}
 		}
@@ -50,6 +45,21 @@ namespace CubeSolver {
 		public override string ToString() => string.Join("",(IEnumerable<Turn>)_turns);
 
 		public Turn[] _turns;
+
+		static IEnumerable<Turn> CleanUpSequence( IEnumerable<Turn> src ) {
+			var items = src.ToList();
+			int i = 0;
+			while( i < items.Count - 1 ) {
+				while( CancelEachOtherOut( items[i], items[i + 1] ) ) {
+					items.RemoveAt( i );
+					items.RemoveAt( i );
+					if( i > 0 ) --i;
+				}
+				++i;
+			}
+			return items;
+		}
+
 	}
 
 }

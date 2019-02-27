@@ -75,14 +75,15 @@ namespace CubeSolver {
 		[InlineData("DFRB")]
 		[InlineData("RL'FFR'L")]
 		[InlineData("RLUDDL'RRBDBBU")]
+		[InlineData("B2")]
 		public void CanSolveCross(string mixItUpMove) {
 
 			var mixItUpTurns = TurnSequence.Parse(mixItUpMove);
 			var cube = mixItUpTurns.TurnCube( new Cube() );
 
 			// When: get cross solution and apply it
-			var turns = Solver.GetCrossSolution( cube );
-			cube = turns.TurnCube( cube );
+			var solution = Solver.GetCrossSolution( cube );
+			cube = solution.TurnCube( cube );
 
 			// Then: cross is solved
 			Assert.True( EdgeConstraint.Stationary(new Edge(Side.Front,Side.Down) ).IsMatch(cube) );

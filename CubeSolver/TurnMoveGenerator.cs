@@ -12,7 +12,7 @@ namespace CubeSolver {
 		static public readonly TurnMove[] AllPossibleTurns;
 
 		static TurnMoveGenerator() {
-			AllPossibleTurns = Turn.AllPossibleMoves
+			AllPossibleTurns = Turn.AllPossibleTurns
 				.Select( x => new TurnMove( x ) )
 				.ToArray();
 		}
