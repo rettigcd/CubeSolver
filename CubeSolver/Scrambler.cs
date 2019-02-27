@@ -10,7 +10,7 @@ namespace CubeSolver {
 			for(int i=0;i<50;++i)
 				cube = cube.ApplyTurn(
 					new Turn(CubeGeometry.AllSides[rnd.Next(6)],
-					rnd.Next(2)==0 ? Direction.Clockwise:Direction.CounterClockwise
+					rnd.Next(2)==0 ? Rotation.Clockwise:Rotation.CounterClockwise
 				));
 			return cube;
 		}

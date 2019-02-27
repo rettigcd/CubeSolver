@@ -17,9 +17,9 @@ namespace CubeSolver {
 			// Build all possible single turns
 			var allPossibleTurns = new List<Turn>();
 			foreach(var side in CubeGeometry.AllSides) {
-				allPossibleTurns.Add( new Turn( side, Direction.Clockwise ) );
-				allPossibleTurns.Add( new Turn( side, Direction.CounterClockwise ) );
-				allPossibleTurns.Add( new Turn( side, Direction.Twice ) );
+				allPossibleTurns.Add( new Turn( side, Rotation.Clockwise ) );
+				allPossibleTurns.Add( new Turn( side, Rotation.CounterClockwise ) );
+				allPossibleTurns.Add( new Turn( side, Rotation.Twice ) );
 			}
 			return allPossibleTurns.ToArray();
 		}
@@ -48,26 +48,26 @@ namespace CubeSolver {
 			}
 		}
 
-		static Direction ParseDirection(char k) {
+		static Rotation ParseDirection(char k) {
 			switch(k) {
-				case '\'': return Direction.CounterClockwise;
-				case '2': return Direction.Twice;
-				default: return Direction.Clockwise; // in case the next character in a series is passed in.
+				case '\'': return Rotation.CounterClockwise;
+				case '2': return Rotation.Twice;
+				default: return Rotation.Clockwise; // in case the next character in a series is passed in.
 			}
 		}
 
-		static string DirectionToString(Direction d) {
+		static string DirectionToString(Rotation d) {
 			switch(d) {
-				case Direction.Clockwise: return string.Empty;
-				case Direction.CounterClockwise: return "'";
-				case Direction.Twice: return "2";
+				case Rotation.Clockwise: return string.Empty;
+				case Rotation.CounterClockwise: return "'";
+				case Rotation.Twice: return "2";
 				default: throw new ArgumentException(nameof(d));
 			}
 		}
 
 		static public Turn Parse(string s, int index=0) =>new Turn( 
 			ParseSideSymbol(s[index]), 
-			index+1<s.Length ? ParseDirection(s[index+1]) : Direction.Clockwise
+			index+1<s.Length ? ParseDirection(s[index+1]) : Rotation.Clockwise
 		);
 
 		static Turn() {
@@ -87,11 +87,11 @@ namespace CubeSolver {
 		#endregion
 
 		public Side Side { get; private set; }
-		public Direction Direction { get; private set; }
+		public Rotation Direction { get; private set; }
 
 		#region constructor
 
-		public Turn(Side side, Direction direction) {
+		public Turn(Side side, Rotation direction) {
 			this.Side = side;
 			this.Direction = direction;
 		}
@@ -100,9 +100,9 @@ namespace CubeSolver {
 
 		public StickerMoveGroup GetMoveSequence() {
 			switch(Direction) {
-				case Direction.Clockwise: return _clockwiseTurnGroupCache[Side];
-				case Direction.CounterClockwise: return _counterclockwiseTurnGroupCache[Side];
-				case Direction.Twice: return _twiceTurnGroupCache[Side];
+				case Rotation.Clockwise: return _clockwiseTurnGroupCache[Side];
+				case Rotation.CounterClockwise: return _counterclockwiseTurnGroupCache[Side];
+				case Rotation.Twice: return _twiceTurnGroupCache[Side];
 				default: throw new ArgumentException(nameof(Direction));
 			}
 		}

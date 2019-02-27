@@ -70,7 +70,7 @@
     <Compile Include="CubeConstraint.cs" />
     <Compile Include="CubeGeometry.cs" />
     <Compile Include="DataGenerating_Tests.cs" />
-    <Compile Include="Direction.cs" />
+    <Compile Include="Rotation.cs" />
     <Compile Include="Edge.cs" />
     <Compile Include="EdgeConstraint.cs" />
     <Compile Include="MoveNotFoundExcpetion.cs" />

@@ -50,12 +50,12 @@ namespace CubeSolver {
 			
 			// 3 turns, not solved
 			for(int i=0;i<3;++i) {
-				cube = cube.ApplyTurn(new Turn(side,Direction.Clockwise));
+				cube = cube.ApplyTurn(new Turn(side,Rotation.Clockwise));
 				Assert.False( cube.IsSolved );
 			}
 
 			// 4th turn resolves it
-			cube = cube.ApplyTurn(new Turn(side,Direction.Clockwise));
+			cube = cube.ApplyTurn(new Turn(side,Rotation.Clockwise));
 			Assert.True( cube.IsSolved );
 
 		}
@@ -69,11 +69,11 @@ namespace CubeSolver {
 			Assert.True( cube.IsSolved );
 			
 			// turn -> unsolved
-			cube = cube.ApplyTurn(new Turn(side,Direction.Clockwise));
+			cube = cube.ApplyTurn(new Turn(side,Rotation.Clockwise));
 			Assert.False( cube.IsSolved );
 
 			// unturn -> resolved
-			cube = cube.ApplyTurn(new Turn(side,Direction.CounterClockwise));
+			cube = cube.ApplyTurn(new Turn(side,Rotation.CounterClockwise));
 			Assert.True( cube.IsSolved );
 
 		}
@@ -87,7 +87,7 @@ namespace CubeSolver {
 			Assert.True( cube.IsSolved );
 			
 			// turn -> unsolved
-			Turn turn = new Turn(side,Direction.Twice);
+			Turn turn = new Turn(side,Rotation.Twice);
 			var x = turn.GetMoveSequence();
 			cube = cube.ApplyTurn( turn );
 			Assert.False( cube.IsSolved );
@@ -108,11 +108,11 @@ namespace CubeSolver {
 			var orig = cube.Clone();
 			
 			// turn -> unsolved
-			cube = cube.ApplyTurn(new Turn(side,Direction.Clockwise));
+			cube = cube.ApplyTurn(new Turn(side,Rotation.Clockwise));
 			Assert.False( orig.Equals(cube) );
 
 			// unturn -> resolved
-			cube = cube.ApplyTurn(new Turn(side,Direction.CounterClockwise));
+			cube = cube.ApplyTurn(new Turn(side,Rotation.CounterClockwise));
 			Assert.True( orig.Equals(cube) );
 
 		}
@@ -138,6 +138,8 @@ namespace CubeSolver {
 		[Theory]
 		[InlineData("ULRB'BR'L'D","UD")]
 		[InlineData("UFF'D","UD")]
+		[InlineData("RU2U2L","RL")]
+		[InlineData("RUU2UL","RL")]
 		public void CancellingTurns_RemovedFromSequence(string orig, string final) {
 			var move = TurnSequence.Parse(orig);
 			string s = move.ToString();
