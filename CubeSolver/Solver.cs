@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using AiSearch.OneSide;
 
 namespace CubeSolver {
@@ -12,7 +11,7 @@ namespace CubeSolver {
 		/// Starts with a solved cube and moves the desired cubies into the constraint. (essentially unsolving it but finding the correct moves)
 		/// Could alternatively move the cubes backwards from the solved state into their desired starting position and then reverse the moves.
 		/// </remarks>
-		static public Turn[] GetStepsToAcheiveMatch( int maxTurnCount, CubeConstraint constraint ) {
+		static public TurnSequence GetStepsToAcheiveMatch( int maxTurnCount, CubeConstraint constraint ) {
 
 			// Tried BreadthFirst but it runs out of memory around depth=6.
 			var moveIterator = new IterativeDeepeningIterator<Cube>( _moveGenerator, maxTurnCount ) { DontRepeat = true };
@@ -23,7 +22,7 @@ namespace CubeSolver {
 			if( winner == null ) throw new MoveNotFoundExcpetion();
 
 			var path = winner.GetNodePath();
-			return path.Skip( 1 ).Select( x => ((TurnMove)x.Move)._turn ).ToArray();
+			return new TurnSequence( path.Skip( 1 ).Select( x => ((TurnMove)x.Move)._turn ).ToArray() );
 		}
 
 		static internal TurnSequence GetCrossSolution( Cube cube ) {
@@ -36,7 +35,7 @@ namespace CubeSolver {
 			move1Constraints.Add( new EdgeConstraint(frontDown,new Edge(Side.Front,Side.Down)) );
 			move1Constraints.Add( new EdgeConstraint(rightDown,new Edge(Side.Right,Side.Down)) );
 
-			var move1Turns = new TurnSequence( GetStepsToAcheiveMatch(6, move1Constraints) );
+			var move1Turns = GetStepsToAcheiveMatch(6, move1Constraints);
 
 			Cube temp = move1Turns.TurnCube( cube );
 
@@ -52,7 +51,7 @@ namespace CubeSolver {
 			move2Constraints.Add( EdgeConstraint.Stationary(new Edge(Side.Front,Side.Down)) );
 			move2Constraints.Add( EdgeConstraint.Stationary(new Edge(Side.Right,Side.Down)) );
 
-			var move2Turns = new TurnSequence( GetStepsToAcheiveMatch(6, move2Constraints) );
+			var move2Turns = GetStepsToAcheiveMatch(6, move2Constraints);
 
 			// combine
 			return new TurnSequence( move1Turns._turns.Concat(move2Turns._turns).ToArray() );
