@@ -92,6 +92,63 @@ namespace CubeSolver {
 			Assert.True( EdgeConstraint.Stationary(new Edge(Side.Left,Side.Down) ).IsMatch(cube) );
 		}
 
+
+		[Fact]
+		public void Ftl_NotImplemented() {
+			Assert.Throws<System.NotImplementedException>(()=>Solver.PlaceFtlPair(new Cube()));
+		}
+
+		[Fact]
+		public void MustSolveCrossBeforePlacingFtl() {
+			var nonSolvedCrossCube = new Cube().Apply(Turn.Parse("R"));
+			Assert.Throws<System.InvalidOperationException>(()=>Solver.PlaceFtlPair(nonSolvedCrossCube));
+		}
+
+		[Theory]
+		// https://en.wikibooks.org/wiki/How_to_Solve_the_Rubik%27s_Cube/CFOP#First_two_layers_(F2L)
+		[InlineData("RUR'U'")][InlineData("F'U'FU")]	// Case 1 - this is interesting, there are 2 solutions with 4 moves
+		[InlineData("RU'R'")][InlineData("F'UF")]		// Case 2
+		// case 3 - hide corner than join -> case 1
+		// case 4 - Corner already in slot and needs brought out and transitioned into case 1 or 2
+		// case 5 - white is facing up, 8 different things, 4 if we reduce by symetery, 
+			// one solutions hides the edge so corner can join -> case 1
+		// case 6 - pair joined wrong way, separate into case 2
+		public void CanPlace_SimpleFtl1(string messUpMoves) {
+
+			// Given
+			var cube = new Cube().Apply(TurnSequence.Parse(messUpMoves));
+			// And
+			var edge = new Edge(Side.Front,Side.Right);
+			var corner = new Corner(Side.Down,Side.Front,Side.Right);
+
+			// When
+			var solution = Solver.PlaceFtlPair( new CompoundConstraint(
+				Solver.FindEdgeAndSolveIt  (cube, edge ),
+				Solver.FindCornerAndSolveIt(cube, corner)
+			));
+			var result = cube.Apply(solution);
+
+			// Then
+			Assert.True( new CompoundConstraint( EdgeConstraint.Stationary(edge),CornerConstraint.Stationary(corner) ).IsMatch(result) );
+			Assert.True( Solver.CrossConstraint.IsMatch(result) );
+		}
+
+		/* this test checks if solver can solve place F2L from anywhere.  It can't - yet
+		[Fact]
+		public void CanFindAndPlace_Ftl1() {
+			var cube = new Scrambler().Scramble(new Cube());
+			var crossSolution = Solver.GetCrossSolution(cube);
+			cube.Apply(crossSolution);
+
+			var ftlSolution = Solver.PlaceFtlPair( new CompoundConstraint(
+				Solver.FindEdgeAndSolveIt  (cube, new Edge  (Side.Front,Side.Right) ),
+				Solver.FindCornerAndSolveIt(cube, new Corner(Side.Down,Side.Front,Side.Right))
+			));
+			var result = cube.Apply(ftlSolution);
+		}
+		*/
+
+
 		#region private static
 
 		static IEnumerable<EdgeConstraint> CrossConstraints() {

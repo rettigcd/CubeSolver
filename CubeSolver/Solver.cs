@@ -16,22 +16,49 @@ namespace CubeSolver {
 				.First();
 		}
 
-		// while (unsolved) 
-			// while(at least 1 pair in top), push into slot
-			// if(unsolved) push pair into top
+		// FYI - FTL => F2L => First 2 Layers
+
+		static public TurnSequence PlaceFtlPair( CubeConstraint ftlConstraint ) {
+			return Solver.GetStepsToAcheiveMatch(6, new CompoundConstraint(
+				ftlConstraint,
+				CrossConstraint
+			));
+		}
+
+		static public TurnSequence PlaceFtlPair( Cube cube ) {
+			VerifyConstraint( cube, CrossConstraint, "Cross not solved" );
+
+			// while (unsolved) 
+				// while(at least 1 pair in top), push into slot
+				// if(unsolved) push pair into top
+
+			throw new System.NotImplementedException();
+		}
+
+		static void VerifyConstraint( Cube cube, CubeConstraint constraint, string msg ) {
+			if( !constraint.IsMatch( cube ) ) throw new System.InvalidOperationException( msg );
+		}
+
+		static public CompoundConstraint CrossConstraint =>
+			new CompoundConstraint(
+				EdgeConstraint.Stationary( CrossEdges[0] ),
+				EdgeConstraint.Stationary( CrossEdges[1] ),
+				EdgeConstraint.Stationary( CrossEdges[2] ),
+				EdgeConstraint.Stationary( CrossEdges[3] )
+			);
+
+		static Edge[] CrossEdges = new[] {
+			new Edge( Side.Front, Side.Down ),
+			new Edge( Side.Right, Side.Down ),
+			new Edge( Side.Back, Side.Down ),
+			new Edge( Side.Left, Side.Down ),
+		};
 
 		static TurnSequence GetCrossSolution_Inner( Cube cube, int i ) {
-			var bottomEdges = new[] {
-				new Edge( Side.Front, Side.Down ),
-				new Edge( Side.Right, Side.Down ),
-				new Edge( Side.Back, Side.Down ),
-				new Edge( Side.Left, Side.Down ),
-			};
-
-			var e0 = bottomEdges[i];
-			var e1 = bottomEdges[(i+1)%4];
-			var e2 = bottomEdges[(i+2)%4];
-			var e3 = bottomEdges[(i+3)%4];
+			var e0 = CrossEdges[i];
+			var e1 = CrossEdges[(i+1)%4];
+			var e2 = CrossEdges[(i+2)%4];
+			var e3 = CrossEdges[(i+3)%4];
 			TurnSequence move1Turns = Solve_First2CrossEdges( cube, e0, e1 );
 			TurnSequence move2Turns = Solve_Second2CrossEdges( cube.Apply( move1Turns ), e0, e1, e2, e3 );
 
@@ -74,8 +101,12 @@ namespace CubeSolver {
 			return new TurnSequence( path.Skip( 1 ).Select( x => ((TurnMove)x.Move)._turn ).ToArray() );
 		}
 
-		static EdgeConstraint FindEdgeAndSolveIt( Cube cube, Edge bottomEdge2 ) {
-			return new EdgeConstraint( Find( cube, bottomEdge2 ), bottomEdge2 );
+		static public EdgeConstraint FindEdgeAndSolveIt( Cube cube, Edge edge ) {
+			return new EdgeConstraint( Find( cube, edge ), edge );
+		}
+
+		static public CornerConstraint FindCornerAndSolveIt( Cube cube, Corner corner ) {
+			return new CornerConstraint( Find( cube, corner ), corner );
 		}
 
 		static Edge Find( Cube cube, Edge needle ) {
@@ -84,6 +115,15 @@ namespace CubeSolver {
 							 && cube[edge.Pos1] == needle.Side1
 				);
 		}
+
+		static Corner Find( Cube cube, Corner needle ) {
+			return CubeGeometry.AllCornerPositions
+				.First( corner => cube[corner.Pos0] == needle.Side0
+							   && cube[corner.Pos1] == needle.Side1
+							   && cube[corner.Pos2] == needle.Side2
+				);
+		}
+
 	}
 
 }

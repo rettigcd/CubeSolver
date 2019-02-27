@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CubeSolver {
 
@@ -39,6 +38,24 @@ namespace CubeSolver {
 					_allEdgePositions = edges.ToArray();
 				}
 				return _allEdgePositions;
+			}
+		}
+
+		static Corner[] _allCornerPositions = null;
+		static public Corner[] AllCornerPositions {
+			get {
+				if( _allCornerPositions == null ) {
+					List<Corner> corners = new List<Corner>();
+					foreach( var face in CubeGeometry.AllSides ) {
+						Side[] adjs = CubeGeometry.GetClockwiseAdjacentFaces( face );
+						corners.Add(new Corner(face,adjs[0],adjs[1]));
+						corners.Add(new Corner(face,adjs[1],adjs[2]));
+						corners.Add(new Corner(face,adjs[2],adjs[3]));
+						corners.Add(new Corner(face,adjs[3],adjs[0]));
+					}
+					_allCornerPositions = corners.ToArray();
+				}
+				return _allCornerPositions;
 			}
 		}
 
