@@ -106,48 +106,72 @@ namespace CubeSolver {
 
 		[Theory]
 		// https://en.wikibooks.org/wiki/How_to_Solve_the_Rubik%27s_Cube/CFOP#First_two_layers_(F2L)
-		[InlineData("RUR'U'")][InlineData("F'U'FU")]	// Case 1 - this is interesting, there are 2 solutions with 4 moves
-		[InlineData("RU'R'")][InlineData("F'UF")]		// Case 2
-		// case 3 - hide corner than join -> case 1
+		// case 1a
+		[InlineData("URU'R'")] 
+		[InlineData("URU'R'U")]
+		[InlineData("URU'R'UU")]
+		[InlineData("URU'R'UUU")]
+		// case 1b
+		[InlineData("U'F'UF")]
+		[InlineData("U'F'UFU")]
+		[InlineData("U'F'UFUU")]
+		[InlineData("U'F'UFUUU")]
+		// case 2a
+		[InlineData("RUR'")]
+		[InlineData("RUR'U")]
+		[InlineData("RUR'UU")]
+		[InlineData("RUR'UUU")]
+		// case 2b
+		[InlineData("F'U'F")]
+		[InlineData("F'U'FU")]
+		[InlineData("F'U'FUU")]
+		[InlineData("F'U'FUUU")]
+		// case 3 - hide corner then join -> case 1
 		// case 4 - Corner already in slot and needs brought out and transitioned into case 1 or 2
 		// case 5 - white is facing up, 8 different things, 4 if we reduce by symetery, 
-			// one solutions hides the edge so corner can join -> case 1
 		// case 6 - pair joined wrong way, separate into case 2
-		public void CanPlace_SimpleFtl1(string messUpMoves) {
+		public void CanPlace_SimpleFtl1(string knowSolveMoves) {
 
 			// Given
-			var cube = new Cube().Apply(TurnSequence.Parse(messUpMoves));
+			var cube = new Cube().Apply( TurnSequence.Parse( knowSolveMoves ).Reverse() );
 			// And
-			var edge = new Edge(Side.Front,Side.Right);
-			var corner = new Corner(Side.Down,Side.Front,Side.Right);
+			FtlPair pair = new FtlPair(Side.Front,Side.Right);
 
 			// When
-			var solution = Solver.PlaceFtlPair( new CompoundConstraint(
-				Solver.FindEdgeAndSolveIt  (cube, edge ),
-				Solver.FindCornerAndSolveIt(cube, corner)
-			));
+			var solution = Solver.PlaceFtlPairDirectly( pair, cube );
 			var result = cube.Apply(solution);
 
 			// Then
-			Assert.True( new CompoundConstraint( EdgeConstraint.Stationary(edge),CornerConstraint.Stationary(corner) ).IsMatch(result) );
+			Assert.True( new CompoundConstraint( 
+				EdgeConstraint.Stationary(pair.Edge),
+				CornerConstraint.Stationary(pair.Corner) 
+			).IsMatch(result) );
 			Assert.True( Solver.CrossConstraint.IsMatch(result) );
 		}
 
-		/* this test checks if solver can solve place F2L from anywhere.  It can't - yet
-		[Fact]
-		public void CanFindAndPlace_Ftl1() {
-			var cube = new Scrambler().Scramble(new Cube());
-			var crossSolution = Solver.GetCrossSolution(cube);
-			cube.Apply(crossSolution);
 
-			var ftlSolution = Solver.PlaceFtlPair( new CompoundConstraint(
-				Solver.FindEdgeAndSolveIt  (cube, new Edge  (Side.Front,Side.Right) ),
-				Solver.FindCornerAndSolveIt(cube, new Corner(Side.Down,Side.Front,Side.Right))
-			));
-			var result = cube.Apply(ftlSolution);
+		[Theory]
+		[InlineData("URU'R'",0)] // case 1a
+		[InlineData("U'F'UF",0)] // case 1b
+		[InlineData("RUR'",0)]   // case 2a
+		[InlineData("F'U'F",0)]  // case 2b
+		[InlineData("U2URU'R'",1)]
+		[InlineData("U2U'F'UF",1)]// fail
+		[InlineData("U2RUR'",1)] // fail
+		[InlineData("U2F'U'F",1)]
+		public void CanPrepF2L(string knownSolution, int expectedPrepMoves) {
+			var cube = new Cube().Apply(TurnSequence.Parse(knownSolution).Reverse());
+
+			var pair = new FtlPair(Side.Front,Side.Right);
+
+			var prepSolution = Solver.PrepareToPlaceFtlPairDirectly(pair,cube);
+			Assert.Equal(expectedPrepMoves,prepSolution._turns.Length);
+			cube = cube.Apply( prepSolution );
+
+			// verify there is now a direct solution
+			var finalSolution = Solver.PrepareToPlaceFtlPairDirectly(pair,cube);
+			Assert.True(finalSolution._turns.Length <= 4);
 		}
-		*/
-
 
 		#region private static
 
@@ -163,5 +187,18 @@ namespace CubeSolver {
 		#endregion
 
 	}
+
+	public class FtlPair {
+
+		public FtlPair(Side leftishSide, Side rightishSide ) {
+			Leftish = leftishSide;
+			Rightish = rightishSide;
+		}
+		public Side Leftish{ get; set; }
+		public Side Rightish{ get; set; }
+		public Edge Edge => new Edge(Leftish,Rightish);
+		public Corner Corner => new Corner(Side.Down,Leftish,Rightish);
+	}
+
 
 }

@@ -2,23 +2,22 @@
 using System.Linq;
 
 namespace CubeSolver {
-
 	/// <summary>
 	/// IsMatch if all its parts are a match.
 	/// </summary>
-	public class CompoundConstraint : CubeConstraint {
+	public class OptionalConstraint : CubeConstraint {
 
 		#region constructors
 
-		public CompoundConstraint() {
+		public OptionalConstraint() {
 			_parts = new List<CubeConstraint>();
 		}
 
-		public CompoundConstraint(IEnumerable<CubeConstraint> parts) {
+		public OptionalConstraint(IEnumerable<CubeConstraint> parts) {
 			_parts = parts.ToList();
 		}
 
-		public CompoundConstraint(params CubeConstraint[] parts) {
+		public OptionalConstraint(params CubeConstraint[] parts) {
 			_parts = parts.ToList();
 		}
 
@@ -29,8 +28,8 @@ namespace CubeSolver {
 		public void AddRange( IEnumerable<CubeConstraint> constraints ) => _parts.AddRange(constraints);
 
 		public bool IsMatch( Cube cube ) {
-			if(_parts.Count == 0) throw new System.InvalidOperationException("no parts");
-			return _parts.All(p=>p.IsMatch(cube));
+			if( _parts.Count == 0) throw new System.InvalidOperationException("no part");
+			return _parts.Any(p=>p.IsMatch(cube));
 		}
 
 		List<CubeConstraint> _parts;

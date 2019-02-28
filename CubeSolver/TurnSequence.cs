@@ -5,10 +5,6 @@ namespace CubeSolver {
 
 	public class TurnSequence : IHaveMoveSequence {
 
-		public TurnSequence(Turn[] turns ) {
-			_turns = CleanUpSequence( turns );
-		}
-
 		static public TurnSequence Parse(string s ) {
 			var items = new List<Turn>();
 			for(int i = 0; i<s.Length; ++i) {
@@ -19,13 +15,19 @@ namespace CubeSolver {
 			return new TurnSequence( items.ToArray() );
 		}
 
+		public TurnSequence(Turn[] turns ) {
+			_turns = CleanUpSequence( turns );
+		}
+
+		public TurnSequence Reverse() => new TurnSequence(_turns.Reverse().Select(x=>x.Reverse()).ToArray());
+
 		public StickerMoveGroup GetMoveSequence() {
 			return StickerMoveGroup.CalculateMultiMoveSequence( _turns.Select(turn=>turn.GetMoveSequence() ) );
 		}
 
 		public override string ToString() => string.Join("",(IEnumerable<Turn>)_turns);
 
-		public Turn[] _turns;
+		#region private methods
 
 		static Turn[] CleanUpSequence( IEnumerable<Turn> src ) {
 			List<Turn> orig = src.ToList();
@@ -55,7 +57,7 @@ namespace CubeSolver {
 					direction = item.Direction;
 				} else {
 					// side repeat
-					direction = AddDirections(direction,item.Direction);
+					direction = direction.Add( item.Direction );
 				}
 			}
 			if(direction!=Rotation.None) result.Add(new Turn(side,direction));
@@ -63,10 +65,13 @@ namespace CubeSolver {
 			return result;
 		}
 
-		static Rotation AddDirections(Rotation d1,Rotation d2) {
-			int i1 = (int)d1, i2 = (int)d2;
-			return (Rotation)((i1+i2)%4);
-		}
+		#endregion
+
+		#region private fields
+
+		public Turn[] _turns;
+
+		#endregion
 
 	}
 

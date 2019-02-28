@@ -16,11 +16,71 @@ namespace CubeSolver {
 				.First();
 		}
 
+		static public TurnSequence PrepareToPlaceFtlPairDirectly( FtlPair pair, Cube cube) {
+
+			var srcEdge = Solver.Find(cube,pair.Edge);
+			var srcCorner = Solver.Find(cube,pair.Corner);
+
+			// corner: Right,Front,Up  edge: front,up
+			Corner targetCornerWhiteRight = new Corner( pair.Rightish, pair.Leftish, Side.Up ); 
+			Edge joinedEdgeOnLeft = new Edge( pair.Leftish, Side.Up );
+			CompoundConstraint prepSolve0 = new CompoundConstraint(
+				new EdgeConstraint( srcEdge, joinedEdgeOnLeft ),
+				new CornerConstraint( srcCorner, targetCornerWhiteRight)
+			);
+
+			// corner: front,up,right  edge: up,right
+			Corner targetCornerWhiteLeft = new Corner( pair.Leftish, Side.Up, pair.Rightish ); 
+			Edge joinedEdgeOnRight = new Edge( Side.Up, pair.Rightish );
+			CompoundConstraint prepSolve1 = new CompoundConstraint(
+				new EdgeConstraint( srcEdge, joinedEdgeOnRight ),
+				new CornerConstraint( srcCorner, targetCornerWhiteLeft)
+			);
+
+			// corner: Right,Front,Up  edge: up,back
+			Edge oppositeBackRight = new Edge( Side.Up, CubeGeometry.OppositeSideOf( pair.Leftish ) );
+			CompoundConstraint prepSolve2 = new CompoundConstraint(
+				new EdgeConstraint( srcEdge, oppositeBackRight ),
+				new CornerConstraint( srcCorner, targetCornerWhiteRight)
+			);
+
+			// corner: front,up,right  edge: left,up
+			Edge oppositeBackLeft = new Edge( CubeGeometry.OppositeSideOf( pair.Rightish ), Side.Up );
+			CompoundConstraint prepSolve3 = new CompoundConstraint(
+				new EdgeConstraint( srcEdge, oppositeBackLeft ),
+				new CornerConstraint( srcCorner, targetCornerWhiteLeft)
+			);
+
+			var options = new OptionalConstraint(
+				prepSolve0,
+				prepSolve1,
+				prepSolve2,
+				prepSolve3
+			);
+
+			// these are constraints to apply move to a solved cube, so constraints don't work on messed up cube
+			var result = Solver.GetStepsToAcheiveMatch(6, new CompoundConstraint(
+				options,
+				CrossConstraint
+			));
+
+			// Test
+			var preppedCube = cube.Apply(result);
+
+			return result;
+		}
+
 		// FYI - FTL => F2L => First 2 Layers
 
-		static public TurnSequence PlaceFtlPair( CubeConstraint ftlConstraint ) {
+		static public TurnSequence PlaceFtlPairDirectly( FtlPair pair, Cube cube ) {
+
+			CompoundConstraint directSolve = new CompoundConstraint(
+				Solver.FindEdgeAndSolveIt( cube, pair.Edge ),
+				Solver.FindCornerAndSolveIt( cube, pair.Corner )
+			);
+
 			return Solver.GetStepsToAcheiveMatch(6, new CompoundConstraint(
-				ftlConstraint,
+				directSolve,
 				CrossConstraint
 			));
 		}

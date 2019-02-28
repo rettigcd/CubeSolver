@@ -63,6 +63,8 @@ namespace CubeSolver {
 			}
 		}
 
+		public Turn Reverse() => new Turn( Side, Direction.Reverse() );
+
 		public override string ToString() => TurnText.ToSideSymbol( Side ) + TurnText.ToDirectionString(Direction);
 		static public Turn Parse(string s, int index=0) =>new Turn( TurnText.ParseSideSymbol(s[index]), index+1<s.Length ? TurnText.ParseDirection(s[index+1]) : Rotation.Clockwise );
 
