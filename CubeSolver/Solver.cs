@@ -19,6 +19,7 @@ namespace CubeSolver {
 		}
 
 		static public TurnSequence SingleFtlPair( FtlPair pair, Cube cube ) {
+			Constraints.VerifyConstraint( cube, Constraints.CrossConstraint, "Cross not solved" );
 
 			// these are constraints to apply move to a solved cube, so constraints don't work on messed up cube
 			return Solver.GetStepsToAcheiveMatch(6, new CompoundConstraint(

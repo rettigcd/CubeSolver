@@ -12,31 +12,35 @@ namespace CubeSolver {
 	/// 
 	/// And throw away the 3 moves that repeat the last sequence
 	/// 
-	/// Leaving a branching factor of 9,6,6,6,6,6... and reducing the depth by 2 for all turns including Rightish and Leftish sides.
+	/// Leaving a branching factor of 9,6,6,6 and reducing the search tree depth to 1..4
 	/// </summary>
 	class SlotTurnGenerator : NodeMoveGenerator<Cube> {
 		FtlPair _slot;
 		TurnSequenceMove[] _turns;
 		public SlotTurnGenerator(FtlPair slot) {
 
-			// TODO:
+			// Alternative to explicitly listing 9 valid moves
 			// Have solver calculate subset of moves that don't violate constraints
-			// Make SlotTurnGenerator work for any slot
 
-			if( slot.Edge.InSameSpace(new Edge(Side.Front,Side.Right))==false)
-				throw new System.NotImplementedException("only implemented for front right");
+			Turn u0 = new Turn(Side.Up,Rotation.Clockwise);
+			Turn u1 = new Turn(Side.Up,Rotation.CounterClockwise);
+			Turn u2 = new Turn(Side.Up,Rotation.Twice);
+			Turn leftOfSlotUp = new Turn(slot.Leftish,Rotation.CounterClockwise);
+			Turn leftOfSlotDown = new Turn(slot.Leftish,Rotation.Clockwise);
+			Turn rightOfSlotUp = new Turn(slot.Rightish,Rotation.Clockwise);
+			Turn rightOfSlotDown = new Turn(slot.Rightish,Rotation.CounterClockwise);
 
 			_slot = slot;
 			_turns = new TurnSequence[] {
-				TurnSequence.Parse("U"),
-				TurnSequence.Parse("U'"),
-				TurnSequence.Parse("U2"),
-				TurnSequence.Parse("RUR'"),
-				TurnSequence.Parse("RU'R'"),
-				TurnSequence.Parse("RU2R'"),
-				TurnSequence.Parse("F'UF"),
-				TurnSequence.Parse("F'U'F"),
-				TurnSequence.Parse("F'U2F"),
+				new TurnSequence( u0 ),
+				new TurnSequence( u1 ),
+				new TurnSequence( u2 ),
+				new TurnSequence( rightOfSlotUp, u0, rightOfSlotDown),
+				new TurnSequence( rightOfSlotUp, u1, rightOfSlotDown),
+				new TurnSequence( rightOfSlotUp, u2, rightOfSlotDown),
+				new TurnSequence( leftOfSlotUp, u0, leftOfSlotDown),
+				new TurnSequence( leftOfSlotUp, u1, leftOfSlotDown),
+				new TurnSequence( leftOfSlotUp, u2, leftOfSlotDown),
 			}.Select(x=>new TurnSequenceMove(x))
 			.ToArray();
 		}

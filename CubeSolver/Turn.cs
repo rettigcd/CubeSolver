@@ -48,6 +48,7 @@ namespace CubeSolver {
 		#region constructor
 
 		public Turn(Side side, Rotation direction) {
+			if(direction == Rotation.None) throw new ArgumentException("Actual turns must be CW,CCW,or 2");
 			this.Side = side;
 			this.Direction = direction;
 		}
