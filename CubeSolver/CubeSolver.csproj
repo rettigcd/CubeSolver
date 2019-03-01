@@ -81,6 +81,7 @@
     <Compile Include="EdgeConstraint.cs" />
     <Compile Include="MoveNotFoundExcpetion.cs" />
     <Compile Include="RotationMath.cs" />
+    <Compile Include="SlotTurnGenerator.cs" />
     <Compile Include="StickerMoveGroup.cs" />
     <Compile Include="Scrambler.cs" />
     <Compile Include="CubeGeometry_Tests.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="TurnMoveGenerator.cs" />
     <Compile Include="TurnMove.cs" />
     <Compile Include="TurnSequence.cs" />
+    <Compile Include="TurnSequenceMove.cs" />
     <Compile Include="TurnText.cs" />
     <Compile Include="Turn_Tests.cs" />
     <Compile Include="Tx.cs" />

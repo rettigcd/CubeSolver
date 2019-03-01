@@ -15,7 +15,7 @@ namespace CubeSolver {
 			return new TurnSequence( items.ToArray() );
 		}
 
-		public TurnSequence(Turn[] turns ) {
+		public TurnSequence(params Turn[] turns ) {
 			_turns = CleanUpSequence( turns );
 		}
 

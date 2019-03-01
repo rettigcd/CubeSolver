@@ -128,36 +128,6 @@ namespace CubeSolver {
 			Assert.True( Solver.CrossConstraint.IsMatch(result) );
 		}
 
-
-		[Theory]
-		// Basic
-		[InlineData("URU'R'",0)]
-		[InlineData("U'F'UF",0)]
-		[InlineData("RUR'",0)]
-		[InlineData("F'U'F",0)]
-		// Basic preceed by a single turn
-		[InlineData("U2URU'R'",1)]
-		[InlineData("U2U'F'UF",1)]
-		[InlineData("U2RUR'",1)]
-		[InlineData("U2F'U'F",1)]
-		public void CanPrepF2L(string knownSolution, int expectedPrepMoves) {
-			var cube = new Cube().Apply(TurnSequence.Parse(knownSolution).Reverse());
-
-			var pair = new FtlPair(Side.Front,Side.Right);
-
-			var prepSolution = Solver.PrepareToPlaceFtlPairDirectly(pair,cube);
-			Assert.Equal(expectedPrepMoves,prepSolution._turns.Length);
-			cube = cube.Apply( prepSolution );
-
-			// verify there is now a direct solution
-			var finalSolution = Solver.PlaceFtlPairDirectly(pair,cube);
-
-			cube = cube.Apply( finalSolution );
-			Assert_F2LSolved( cube );
-			Assert_CrossSolved( cube );
-		}
-
-		
 		[Theory]
 		// from: https://solvethecube.com/algorithms
 		// Basic Case 
@@ -170,29 +140,29 @@ namespace CubeSolver {
 		[InlineData("UF'UFU'F'U'F")]
 		[InlineData("U'RUR'URUR'")]
 		[InlineData("UF'U'FU'F'U'F")]
-		//[InlineData("dR'U2Rd'RUR'")] // parsin
-		//[InlineData("U'RU2R'dR'U'R")] // parsing
-		//[InlineData("RU'R'UdR'U'R")] // parsing
-		//[InlineData("F'UFU'd'FUF'")] // parsing
+		[InlineData("UF'U2FU'RUR'")]  // d R'U2R d' RUR'
+		[InlineData("U'RU2R'UF'U'F")] // U'RU2R'dR'U'R
+		[InlineData("RU'R'U2F'U'F")]  // RU'R'UdR'U'R
+		[InlineData("F'UFU'U'RUR'")]  // F'UFU'd'FUF'
 		[InlineData("UF'U2FUF'U2F")]
 		[InlineData("U'RU2R'U'RU2R'")]
 		[InlineData("UF'U'FUF'U2F")]
 		[InlineData("U'RUR'U'RU2R'")]
 		// Corner pointing up, edge in top row
-		//[InlineData("RU2R'U'RUR")]  // couldn't find solution
+		[InlineData("RU2R'U'RUR'")]
 		[InlineData("F'U2FUF'U'F")]
 		[InlineData("URU2R'URU'R'")]
 		[InlineData("U'F'U2FU'F'UF")]
 		[InlineData("U2RUR'URU'R'")]
 		[InlineData("U2F'U'FU'F'UF")]
-		[InlineData("RUR'U'U'RUR'U'RUR'")]
-		//[InlineData("y'R'U'RUUR'U'RUR'U'R")] // parsing error
+		[InlineData("RUR'U2RUR'U'RUR'")]
+		[InlineData("F'U'FU2F'U'FUF'U'F")] // y'R'U'RUUR'U'RUR'U'R
 		// Corner in top row, edge in middle 
 		[InlineData("UF'UFUF'U2F")]
 		[InlineData("U'RU'R'U'RU2R'")]
-		//[InlineData("UF'U'Fd'FUF'")] // parse
-		//[InlineData("U'RUR'dR'U'R")] // parse
-		//[InlineData("RU'R'dR'UR")] // parse
+		[InlineData("UF'U'FU'RUR'")]	// UF'U'Fd'FUF'
+		[InlineData("U'RUR'UF'U'F")]	// U'RUR'dR'U'R
+		[InlineData("RU'R'UF'UF")]		// RU'R'dR'UR
 		[InlineData("RUR'U'RUR'U'RUR'")]
 		// corner in bottom, edge in top
 		[InlineData("URU'R'U'F'UF")]
@@ -204,9 +174,9 @@ namespace CubeSolver {
 		// corner in bottom, edge in middle
 		[InlineData("RU'R'URU2R'URU'R'")]
 		[InlineData("RU'R'U'RUR'U'RU2R'")]
-		//[InlineData("RUR'U'RU'R'UdR'U'R")] // parse
-		//[InlineData("RU'R'dR'U'RU'R'U'R")] // parse
-		//[InlineData("RU'R'dR'U2RUR'U2R")] // parse
+		[InlineData("RUR'U'RU'R'U2F'U'F")] // RUR'U'RU'R'UdR'U'R
+		[InlineData("RU'R'UF'U'FU'F'U'F")] // RU'R'dR'U'RU'R'U'R
+		[InlineData("RU'R'UF'U2FUF'U2F")]  // RU'R'dR'U2RUR'U2R
 		public void F2L(string knownSolution ) {
 			var solveTurns = TurnSequence.Parse( knownSolution );
 			var cube = new Cube().Apply( solveTurns.Reverse() );
