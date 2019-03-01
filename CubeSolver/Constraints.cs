@@ -1,32 +1,17 @@
 ﻿using System.Linq;
 
 namespace CubeSolver {
+
 	static class Constraints {
 
 		#region constraints
 
-		static public CubeConstraint DontMoveOtherSlotConstraint( FtlPair movingSlot) {
-
-			var allSlots = new FtlPair[]{
-				new FtlPair(Side.Right, Side.Back),
-				new FtlPair(Side.Back, Side.Left),
-				new FtlPair(Side.Left, Side.Front),
-				new FtlPair(Side.Left, Side.Front)
-			};
-			
-			var slotsToNotMove = allSlots
-				.Where(x=>!x.Edge.InSameSpace(movingSlot.Edge));
-
-			return new CompoundConstraint( slotsToNotMove.Select(x=>x.Stationary) );
-
-		}
-
-		static public CompoundConstraint MovePairDirectlyToSlot(FtlPair pair, Cube cube) {
-			return new CompoundConstraint(
-				Solver.FindEdgeAndSolveIt( cube, pair.Edge ),
-				Solver.FindCornerAndSolveIt( cube, pair.Corner )
-			);
-		}
+		static public readonly FtlPair[] AllFtlSlots = new FtlPair[]{
+			new FtlPair(Side.Right, Side.Back),
+			new FtlPair(Side.Back, Side.Left),
+			new FtlPair(Side.Left, Side.Front),
+			new FtlPair(Side.Left, Side.Front)
+		};
 
 		static public Edge[] CrossEdges = new[] {
 			new Edge( Side.Front, Side.Down ),
@@ -34,6 +19,15 @@ namespace CubeSolver {
 			new Edge( Side.Back, Side.Down ),
 			new Edge( Side.Left, Side.Down ),
 		};
+
+		static public CubeConstraint OtherSlotsConstraint( FtlPair movingSlot) {
+			
+			var slotsToNotMove = AllFtlSlots
+				.Where(x=>!x.Home.Edge.InSameSpace(movingSlot.Home.Edge));
+
+			return new CompoundConstraint( slotsToNotMove.Select(x=>x.Home.Stationary) );
+
+		}
 
 		static readonly public CompoundConstraint CrossConstraint =
 			new CompoundConstraint( CrossEdges.Select(x=>EdgeConstraint.Stationary(x)) );

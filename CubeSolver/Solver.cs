@@ -11,6 +11,32 @@ namespace CubeSolver {
 		static public TurnSequence PlaceFtlPairs( Cube cube ) {
 			Constraints.VerifyConstraint( cube, Constraints.CrossConstraint, "Cross not solved" );
 
+			var cur = cube;
+
+			// if parts of cube are in different slots
+				// there are 2 options as to which cube you pop-up first
+			
+			// to move 1 slot up where there are no pairs in upper
+				// there are only 6 option (3 leftish + 3 rightish)
+
+			// to move 1 slot up where one of the pairs is already in upper
+				// there are 4 Upper turns * (3 leftish + 3 rightish) = 24 options
+
+			// Also 24 happens to be the Least Common Multiple of 8 edge positions & 12 corner positions
+
+			// If we evaluate all of them, 2*6*24 ==> 288 positions we have to solve
+			// but there are essenially only 12 possibilities (white-up:4 + white-to-theside:8)
+			// knowledge:
+				// white-on-the-side is better than white-up -> reduces possibility from 12 to 8
+				// case 1 or 2 (joined or side-op) are better than case 3 or 4
+				// joined incorrectly is the worse.
+			
+
+			//foreach(var slot in Constraints.AllFtlSlots) {
+			//	Corner corner = Find(cube,slot.Corner);
+			//	Edge edge = Find(cube,slot.Edge);
+			//}
+
 			// while (unsolved) 
 				// while(at least 1 pair in top), push into slot
 				// if(unsolved) push pair into top
@@ -18,14 +44,14 @@ namespace CubeSolver {
 			throw new System.NotImplementedException();
 		}
 
-		static public TurnSequence SingleFtlPair( FtlPair pair, Cube cube ) {
+		static public TurnSequence PlaceSingleFtlPairFromTop( FtlSlot pair, Cube cube ) {
 			Constraints.VerifyConstraint( cube, Constraints.CrossConstraint, "Cross not solved" );
 
 			// these are constraints to apply move to a solved cube, so constraints don't work on messed up cube
 			return Solver.GetStepsToAcheiveMatch(6, new CompoundConstraint(
-				Constraints.MovePairDirectlyToSlot( pair, cube ),
+				FindFtlPairAndSolveIt( pair, cube ),
 				Constraints.CrossConstraint,
-				Constraints.DontMoveOtherSlotConstraint( pair )
+				Constraints.OtherSlotsConstraint( pair )
 			), new SlotTurnGenerator(pair)
 			);
 
@@ -101,6 +127,21 @@ namespace CubeSolver {
 		}
 
 		#region Cube Finders
+
+		static public CompoundConstraint FindFtlPairAndSolveIt(FtlSlot slot, Cube cube) {
+			CornerEdgePair src = FindFtlPair( slot, cube );
+			return new CompoundConstraint(
+				new CornerConstraint( src.Corner, slot.Home.Corner ),
+				new EdgeConstraint( src.Edge, slot.Home.Edge )
+			);
+		}
+
+		static CornerEdgePair FindFtlPair(FtlSlot destinationSlot, Cube cube) {
+			return new CornerEdgePair(
+				Find( cube, destinationSlot.Home.Corner ),
+				Find( cube, destinationSlot.Home.Edge )
+			);
+		}
 
 		static public EdgeConstraint FindEdgeAndSolveIt( Cube cube, Edge edge ) {
 			return new EdgeConstraint( Find( cube, edge ), edge );

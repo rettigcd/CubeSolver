@@ -15,9 +15,9 @@ namespace CubeSolver {
 	/// Leaving a branching factor of 9,6,6,6 and reducing the search tree depth to 1..4
 	/// </summary>
 	class SlotTurnGenerator : NodeMoveGenerator<Cube> {
-		FtlPair _slot;
+		FtlSlot _slot;
 		TurnSequenceMove[] _turns;
-		public SlotTurnGenerator(FtlPair slot) {
+		public SlotTurnGenerator(FtlSlot slot) {
 
 			// Alternative to explicitly listing 9 valid moves
 			// Have solver calculate subset of moves that don't violate constraints
@@ -25,10 +25,10 @@ namespace CubeSolver {
 			Turn u0 = new Turn(Side.Up,Rotation.Clockwise);
 			Turn u1 = new Turn(Side.Up,Rotation.CounterClockwise);
 			Turn u2 = new Turn(Side.Up,Rotation.Twice);
-			Turn leftOfSlotUp = new Turn(slot.Leftish,Rotation.CounterClockwise);
-			Turn leftOfSlotDown = new Turn(slot.Leftish,Rotation.Clockwise);
-			Turn rightOfSlotUp = new Turn(slot.Rightish,Rotation.Clockwise);
-			Turn rightOfSlotDown = new Turn(slot.Rightish,Rotation.CounterClockwise);
+			Turn leftOfSlotUp = new Turn(slot.LeftOf,Rotation.CounterClockwise);
+			Turn leftOfSlotDown = new Turn(slot.LeftOf,Rotation.Clockwise);
+			Turn rightOfSlotUp = new Turn(slot.RightOf,Rotation.Clockwise);
+			Turn rightOfSlotDown = new Turn(slot.RightOf,Rotation.CounterClockwise);
 
 			_slot = slot;
 			_turns = new TurnSequence[] {

@@ -68,7 +68,7 @@ namespace CubeSolver {
 		public void MustSolveCrossBeforePlacingFtl() {
 			var nonSolvedCrossCube = new Cube().Apply(Turn.Parse("R"));
 			var slot = new FtlPair( Side.Front, Side.Right );
-			Assert.Throws<System.InvalidOperationException>(()=> Solver.SingleFtlPair( slot, nonSolvedCrossCube ) );
+			Assert.Throws<System.InvalidOperationException>(()=> Solver.PlaceSingleFtlPairFromTop( slot, nonSolvedCrossCube ) );
 		}
 
 		[Theory]
@@ -127,7 +127,7 @@ namespace CubeSolver {
 
 			var pair = new FtlPair( Side.Front, Side.Right );
 
-			var prepSolution = Solver.SingleFtlPair( pair, cube );
+			var prepSolution = Solver.PlaceSingleFtlPairFromTop( pair, cube );
 			cube=cube.Apply( prepSolution );
 
 			Assert_F2LSolved( cube );
@@ -139,11 +139,11 @@ namespace CubeSolver {
 			Assert.True( Constraints.CrossConstraint.IsMatch( cube ), "cross not solved" );
 		}
 
-		private static void Assert_F2LSolved( Cube cube ) {
-			Assert.True( new FtlPair( Side.Front, Side.Right ).Stationary.IsMatch( cube ),"FrontRight F2L not solved" );
-			Assert.True( new FtlPair( Side.Right, Side.Back ).Stationary.IsMatch( cube ),"BackRight F2L not solved"  );
-			Assert.True( new FtlPair( Side.Back, Side.Left ).Stationary.IsMatch( cube ),"BackLeft F2L not solved"  );
-			Assert.True( new FtlPair( Side.Left, Side.Front ).Stationary.IsMatch( cube ), "FrontLeft F2L not solved" );
+		static void Assert_F2LSolved( Cube cube ) {
+			Assert.True( new FtlPair( Side.Front, Side.Right ).Home.Stationary.IsMatch( cube ),"FrontRight F2L not solved" );
+			Assert.True( new FtlPair( Side.Right, Side.Back ).Home.Stationary.IsMatch( cube ),"BackRight F2L not solved"  );
+			Assert.True( new FtlPair( Side.Back, Side.Left ).Home.Stationary.IsMatch( cube ),"BackLeft F2L not solved"  );
+			Assert.True( new FtlPair( Side.Left, Side.Front ).Home.Stationary.IsMatch( cube ), "FrontLeft F2L not solved" );
 		}
 
 		#region private static
