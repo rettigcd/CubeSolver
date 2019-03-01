@@ -2,13 +2,23 @@
 using System.Linq;
 using Xunit;
 
-// create 2-turn, dis allow duplicate turning
-// turn sequence
-// remove repeat
-
 namespace CubeSolver {
 
 	public class Solver_Tests {
+
+		[Fact]
+		public void CanSolveCrossAndFirst2Layers() {
+			var scrambled = new Scrambler().Scramble(new Cube());
+
+			var crossSolution = Solver.GetCrossSolution(scrambled);
+			var crossSolved = scrambled.Apply( crossSolution );
+
+			var ftlSolution = Solver.PlaceFtlPairs( crossSolved );
+			var ftlSolved = crossSolved.Apply(ftlSolution);
+
+			int i = 0;
+
+		}
 
 		public static IEnumerable<object[]> EdgeCorners {
 			get {
@@ -67,7 +77,7 @@ namespace CubeSolver {
 		[Fact]
 		public void MustSolveCrossBeforePlacingFtl() {
 			var nonSolvedCrossCube = new Cube().Apply(Turn.Parse("R"));
-			var slot = new FtlPair( Side.Front, Side.Right );
+			var slot = new FtlSlot( Side.Front, Side.Right );
 			Assert.Throws<System.InvalidOperationException>(()=> Solver.PlaceSingleFtlPairFromTop( slot, nonSolvedCrossCube ) );
 		}
 
@@ -125,7 +135,7 @@ namespace CubeSolver {
 			var cube = new Cube().Apply( solveTurns.Reverse() );
 			Assert.True( cube.Apply( solveTurns ).IsSolved, "not solved" );
 
-			var pair = new FtlPair( Side.Front, Side.Right );
+			var pair = new FtlSlot( Side.Front, Side.Right );
 
 			var prepSolution = Solver.PlaceSingleFtlPairFromTop( pair, cube );
 			cube=cube.Apply( prepSolution );
@@ -140,10 +150,10 @@ namespace CubeSolver {
 		}
 
 		static void Assert_F2LSolved( Cube cube ) {
-			Assert.True( new FtlPair( Side.Front, Side.Right ).Home.Stationary.IsMatch( cube ),"FrontRight F2L not solved" );
-			Assert.True( new FtlPair( Side.Right, Side.Back ).Home.Stationary.IsMatch( cube ),"BackRight F2L not solved"  );
-			Assert.True( new FtlPair( Side.Back, Side.Left ).Home.Stationary.IsMatch( cube ),"BackLeft F2L not solved"  );
-			Assert.True( new FtlPair( Side.Left, Side.Front ).Home.Stationary.IsMatch( cube ), "FrontLeft F2L not solved" );
+			Assert.True( new FtlSlot( Side.Front, Side.Right ).Home.Stationary.IsMatch( cube ),"FrontRight F2L not solved" );
+			Assert.True( new FtlSlot( Side.Right, Side.Back ).Home.Stationary.IsMatch( cube ),"BackRight F2L not solved"  );
+			Assert.True( new FtlSlot( Side.Back, Side.Left ).Home.Stationary.IsMatch( cube ),"BackLeft F2L not solved"  );
+			Assert.True( new FtlSlot( Side.Left, Side.Front ).Home.Stationary.IsMatch( cube ), "FrontLeft F2L not solved" );
 		}
 
 		#region private static

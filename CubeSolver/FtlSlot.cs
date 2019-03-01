@@ -28,6 +28,8 @@ namespace CubeSolver {
 		/// <summary> Cubes in the slot. </summary>
 		public CornerEdgePair Home{ get; private set; }
 
+		public override string ToString() => LeftOf+":"+RightOf;
+
 	}
 
 

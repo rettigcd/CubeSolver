@@ -6,11 +6,11 @@ namespace CubeSolver {
 
 		#region constraints
 
-		static public readonly FtlPair[] AllFtlSlots = new FtlPair[]{
-			new FtlPair(Side.Right, Side.Back),
-			new FtlPair(Side.Back, Side.Left),
-			new FtlPair(Side.Left, Side.Front),
-			new FtlPair(Side.Left, Side.Front)
+		static public readonly FtlSlot[] AllFtlSlots = new FtlSlot[]{
+			new FtlSlot(Side.Right, Side.Back),
+			new FtlSlot(Side.Back, Side.Left),
+			new FtlSlot(Side.Left, Side.Front),
+			new FtlSlot(Side.Left, Side.Front)
 		};
 
 		static public Edge[] CrossEdges = new[] {
@@ -20,7 +20,7 @@ namespace CubeSolver {
 			new Edge( Side.Left, Side.Down ),
 		};
 
-		static public CubeConstraint OtherSlotsConstraint( FtlPair movingSlot) {
+		static public CubeConstraint OtherSlotsConstraint( FtlSlot movingSlot) {
 			
 			var slotsToNotMove = AllFtlSlots
 				.Where(x=>!x.Home.Edge.InSameSpace(movingSlot.Home.Edge));

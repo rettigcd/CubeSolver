@@ -71,10 +71,11 @@
     <Compile Include="Constraints.cs" />
     <Compile Include="Corner.cs" />
     <Compile Include="CornerConstraint.cs" />
+    <Compile Include="CornerEdgePair.cs" />
     <Compile Include="CubeConstraint.cs" />
     <Compile Include="CubeGeometry.cs" />
     <Compile Include="DataGenerating_Tests.cs" />
-    <Compile Include="FtlPair.cs" />
+    <Compile Include="FtlSlot.cs" />
     <Compile Include="IHaveMoveSequence.cs" />
     <Compile Include="OptionalConstraint.cs" />
     <Compile Include="Rotation.cs" />
