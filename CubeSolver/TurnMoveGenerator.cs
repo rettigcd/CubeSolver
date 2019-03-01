@@ -21,9 +21,9 @@ namespace CubeSolver {
 			if( s.Move == null )
 				return AllPossibleTurnMoves;
 
-			Side previousTurnSide = ((TurnSequenceMove)s.Move)._turns._turns[0].Side;
+			Side previousTurnSide = ((TurnSequenceMove)s.Move)._sequence._turns[0].Side;
 			return AllPossibleTurnMoves
-				.Where(turn => turn._turns._turns[0].Side != previousTurnSide );
+				.Where(turn => turn._sequence._turns[0].Side != previousTurnSide );
 		}
 
 	}

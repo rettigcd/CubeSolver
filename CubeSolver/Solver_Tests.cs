@@ -42,34 +42,6 @@ namespace CubeSolver {
 			}
 		}
 
-		[Theory(Skip = "These are data-generating methods, not really tests.")]
-		[MemberData(nameof(EdgeCorners))]
-		//	CanPlaceCornerEdgePair_FrontRightSlot( new Edge(Side.Up,Side.Back), new Corner(Side.Right,Side.Front,Side.Up) ); // RUR'
-		//	CanPlaceCornerEdgePair_FrontRightSlot( new Edge(Side.Right,Side.Up), new Corner(Side.Back,Side.Right,Side.Up) ); // F'UF
-		public void CanPlaceCornerEdgePair_FrontRightSlot( Edge edgeSource, Corner cornerSource ) {
-
-			var constraints = new CompoundConstraint();
-
-			Edge edgeDestination = new Edge( Side.Front, Side.Right );
-				constraints.Add( new EdgeConstraint( edgeSource, edgeDestination ) );
-			Corner cornerDestination = new Corner( Side.Down, Side.Front, Side.Right );
-				constraints.Add( new CornerConstraint( cornerSource, cornerDestination ) );
-
-			constraints.AddRange( CrossConstraints() );
-
-			constraints.AddRange( new CubeConstraint[] {
-				CornerConstraint.Stationary(new Corner(Side.Down,Side.Right,Side.Back)),
-				CornerConstraint.Stationary(new Corner(Side.Down,Side.Back,Side.Left)),
-				CornerConstraint.Stationary(new Corner(Side.Down,Side.Left,Side.Front)),
-				EdgeConstraint.Stationary(new Edge(Side.Right,Side.Back)),
-				EdgeConstraint.Stationary(new Edge(Side.Back,Side.Left)),
-				EdgeConstraint.Stationary(new Edge(Side.Left,Side.Front)),
-			} );
-
-			var turns = Solver.GetStepsToAcheiveMatch( 8, constraints );
-
-		}
-
 		[Theory]
 		[InlineData("DFR")]
 		[InlineData("DFRB")]
@@ -92,40 +64,11 @@ namespace CubeSolver {
 			Assert.True( EdgeConstraint.Stationary(new Edge(Side.Left,Side.Down) ).IsMatch(cube) );
 		}
 
-
-		[Fact]
-		public void Ftl_NotImplemented() {
-			Assert.Throws<System.NotImplementedException>(()=>Solver.PlaceFtlPair(new Cube()));
-		}
-
 		[Fact]
 		public void MustSolveCrossBeforePlacingFtl() {
 			var nonSolvedCrossCube = new Cube().Apply(Turn.Parse("R"));
-			Assert.Throws<System.InvalidOperationException>(()=>Solver.PlaceFtlPair(nonSolvedCrossCube));
-		}
-
-		[Theory]
-		[InlineData("URU'R'")] 
-		[InlineData("U'F'UF")]
-		[InlineData("RUR'")]
-		[InlineData("F'U'F")]
-		public void CanPlace_SimpleFtl1(string knowSolveMoves) {
-
-			// Given
-			var cube = new Cube().Apply( TurnSequence.Parse( knowSolveMoves ).Reverse() );
-			// And
-			FtlPair pair = new FtlPair(Side.Front,Side.Right);
-
-			// When
-			var solution = Solver.PlaceFtlPairDirectly( pair, cube );
-			var result = cube.Apply(solution);
-
-			// Then
-			Assert.True( new CompoundConstraint( 
-				EdgeConstraint.Stationary(pair.Edge),
-				CornerConstraint.Stationary(pair.Corner) 
-			).IsMatch(result) );
-			Assert.True( Solver.CrossConstraint.IsMatch(result) );
+			var slot = new FtlPair( Side.Front, Side.Right );
+			Assert.Throws<System.InvalidOperationException>(()=> Solver.SingleFtlPair( slot, nonSolvedCrossCube ) );
 		}
 
 		[Theory]
@@ -184,7 +127,7 @@ namespace CubeSolver {
 
 			var pair = new FtlPair( Side.Front, Side.Right );
 
-			var prepSolution = Solver.FtlSolution( pair, cube );
+			var prepSolution = Solver.SingleFtlPair( pair, cube );
 			cube=cube.Apply( prepSolution );
 
 			Assert_F2LSolved( cube );
@@ -193,7 +136,7 @@ namespace CubeSolver {
 		}
 
 		static void Assert_CrossSolved( Cube cube ) {
-			Assert.True( Solver.CrossConstraint.IsMatch( cube ), "cross not solved" );
+			Assert.True( Constraints.CrossConstraint.IsMatch( cube ), "cross not solved" );
 		}
 
 		private static void Assert_F2LSolved( Cube cube ) {

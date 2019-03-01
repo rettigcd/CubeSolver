@@ -19,6 +19,10 @@ namespace CubeSolver {
 		TurnSequenceMove[] _turns;
 		public SlotTurnGenerator(FtlPair slot) {
 
+			// TODO:
+			// Have solver calculate subset of moves that don't violate constraints
+			// Make SlotTurnGenerator work for any slot
+
 			if( slot.Edge.InSameSpace(new Edge(Side.Front,Side.Right))==false)
 				throw new System.NotImplementedException("only implemented for front right");
 
@@ -41,9 +45,9 @@ namespace CubeSolver {
 			if(node.Move == null)
 				return _turns;
 
-			Side previousTurnSide = ((TurnSequenceMove)node.Move)._turns._turns[0].Side;
+			Side previousTurnSide = ((TurnSequenceMove)node.Move)._sequence._turns[0].Side;
 			return _turns
-				.Where(t=>t._turns._turns[0].Side != previousTurnSide);
+				.Where(t=>t._sequence._turns[0].Side != previousTurnSide);
 		}
 	}
 

@@ -95,7 +95,6 @@
     <Compile Include="MovablePosition.cs" />
     <Compile Include="Turn.cs" />
     <Compile Include="TurnMoveGenerator.cs" />
-    <Compile Include="TurnMove.cs" />
     <Compile Include="TurnSequence.cs" />
     <Compile Include="TurnSequenceMove.cs" />
     <Compile Include="TurnText.cs" />
