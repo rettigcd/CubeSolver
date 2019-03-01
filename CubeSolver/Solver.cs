@@ -19,11 +19,15 @@ namespace CubeSolver {
 			FtlSlot easiestSlotToSolve = FindEasiestSlotToSolve( cur );
 			int num = HoldingSlotCount(easiestSlotToSolve,cur);
 			while(easiestSlotToSolve != null) {
+
+				string debug = string.Join("\r\n",Constraints.AllFtlSlots.Select(slot => slot.Examine(cube)));
+
 				var move = PlaceSingleFtlPairFromTop( easiestSlotToSolve, cube );
 				turns.AddRange( move._turns );
 				cur = cur.Apply( move );
-				easiestSlotToSolve = FindEasiestSlotToSolve( cur );
-				num = HoldingSlotCount(easiestSlotToSolve,cur);
+
+
+				easiestSlotToSolve = FindEasiestSlotToSolve( cur ); num = HoldingSlotCount(easiestSlotToSolve,cur);
 			}
 
 			return new TurnSequence(turns.ToArray());

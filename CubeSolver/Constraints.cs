@@ -10,7 +10,7 @@ namespace CubeSolver {
 			new FtlSlot(Side.Right, Side.Back),
 			new FtlSlot(Side.Back, Side.Left),
 			new FtlSlot(Side.Left, Side.Front),
-			new FtlSlot(Side.Left, Side.Front)
+			new FtlSlot(Side.Front, Side.Right)
 		};
 
 		static public Edge[] CrossEdges = new[] {
