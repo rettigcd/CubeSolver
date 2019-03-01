@@ -105,31 +105,10 @@ namespace CubeSolver {
 		}
 
 		[Theory]
-		// https://en.wikibooks.org/wiki/How_to_Solve_the_Rubik%27s_Cube/CFOP#First_two_layers_(F2L)
-		// case 1a
 		[InlineData("URU'R'")] 
-		[InlineData("URU'R'U")]
-		[InlineData("URU'R'UU")]
-		[InlineData("URU'R'UUU")]
-		// case 1b
 		[InlineData("U'F'UF")]
-		[InlineData("U'F'UFU")]
-		[InlineData("U'F'UFUU")]
-		[InlineData("U'F'UFUUU")]
-		// case 2a
 		[InlineData("RUR'")]
-		[InlineData("RUR'U")]
-		[InlineData("RUR'UU")]
-		[InlineData("RUR'UUU")]
-		// case 2b
 		[InlineData("F'U'F")]
-		[InlineData("F'U'FU")]
-		[InlineData("F'U'FUU")]
-		[InlineData("F'U'FUUU")]
-		// case 3 - hide corner then join -> case 1
-		// case 4 - Corner already in slot and needs brought out and transitioned into case 1 or 2
-		// case 5 - white is facing up, 8 different things, 4 if we reduce by symetery, 
-		// case 6 - pair joined wrong way, separate into case 2
 		public void CanPlace_SimpleFtl1(string knowSolveMoves) {
 
 			// Given
@@ -151,10 +130,12 @@ namespace CubeSolver {
 
 
 		[Theory]
-		[InlineData("URU'R'",0)] // case 1a
-		[InlineData("U'F'UF",0)] // case 1b
-		[InlineData("RUR'",0)]   // case 2a
-		[InlineData("F'U'F",0)]  // case 2b
+		// Basic
+		[InlineData("URU'R'",0)]
+		[InlineData("U'F'UF",0)]
+		[InlineData("RUR'",0)]
+		[InlineData("F'U'F",0)]
+		// Basic preceed by a single turn
 		[InlineData("U2URU'R'",1)]
 		[InlineData("U2U'F'UF",1)]
 		[InlineData("U2RUR'",1)]
@@ -176,7 +157,9 @@ namespace CubeSolver {
 			Assert_CrossSolved( cube );
 		}
 
+		
 		[Theory]
+		// from: https://solvethecube.com/algorithms
 		// Basic Case 
 		[InlineData("URU'R'")]
 		[InlineData("U'F'UF")]
@@ -187,16 +170,44 @@ namespace CubeSolver {
 		[InlineData("UF'UFU'F'U'F")]
 		[InlineData("U'RUR'URUR'")]
 		[InlineData("UF'U'FU'F'U'F")]
-		//[InlineData("dR'U2Rd'RUR'")]
-		//[InlineData("U'RU2R'dR'U'R")]
-		//[InlineData("RU'R'UdR'U'R")]
-		//[InlineData("F'UFU'd'FUF'")]
+		//[InlineData("dR'U2Rd'RUR'")] // parsin
+		//[InlineData("U'RU2R'dR'U'R")] // parsing
+		//[InlineData("RU'R'UdR'U'R")] // parsing
+		//[InlineData("F'UFU'd'FUF'")] // parsing
 		[InlineData("UF'U2FUF'U2F")]
 		[InlineData("U'RU2R'U'RU2R'")]
 		[InlineData("UF'U'FUF'U2F")]
 		[InlineData("U'RUR'U'RU2R'")]
-
-		public void XX(string knownSolution ) {
+		// Corner pointing up, edge in top row
+		//[InlineData("RU2R'U'RUR")]  // couldn't find solution
+		[InlineData("F'U2FUF'U'F")]
+		[InlineData("URU2R'URU'R'")]
+		[InlineData("U'F'U2FU'F'UF")]
+		[InlineData("U2RUR'URU'R'")]
+		[InlineData("U2F'U'FU'F'UF")]
+		[InlineData("RUR'U'U'RUR'U'RUR'")]
+		//[InlineData("y'R'U'RUUR'U'RUR'U'R")] // parsing error
+		// Corner in top row, edge in middle 
+		[InlineData("UF'UFUF'U2F")]
+		[InlineData("U'RU'R'U'RU2R'")]
+		//[InlineData("UF'U'Fd'FUF'")] // parse
+		//[InlineData("U'RUR'dR'U'R")] // parse
+		//[InlineData("RU'R'dR'UR")] // parse
+		[InlineData("RUR'U'RUR'U'RUR'")]
+		// corner in bottom, edge in top
+		[InlineData("URU'R'U'F'UF")]
+		[InlineData("U'F'UFURU'R'")]
+		[InlineData("F'UFU'F'UF")]
+		[InlineData("RU'R'URU'R'")]
+		[InlineData("RUR'U'RUR'")]
+		[InlineData("F'U'FUF'U'F")]
+		// corner in bottom, edge in middle
+		[InlineData("RU'R'URU2R'URU'R'")]
+		[InlineData("RU'R'U'RUR'U'RU2R'")]
+		//[InlineData("RUR'U'RU'R'UdR'U'R")] // parse
+		//[InlineData("RU'R'dR'U'RU'R'U'R")] // parse
+		//[InlineData("RU'R'dR'U2RUR'U2R")] // parse
+		public void F2L(string knownSolution ) {
 			var solveTurns = TurnSequence.Parse( knownSolution );
 			var cube = new Cube().Apply( solveTurns.Reverse() );
 			Assert.True( cube.Apply( solveTurns ).IsSolved, "not solved" );
