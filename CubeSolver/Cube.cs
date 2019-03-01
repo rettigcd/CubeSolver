@@ -57,7 +57,9 @@ namespace CubeSolver {
 
 		#region override Equals
 
-		// not overriding GetHashCode because I don't think we will use this as a dictionary key
+		public override int GetHashCode() {
+			throw new InvalidOperationException("dude! why are you trying to use a cube's hash?");
+		}
 
 		public bool Equals( Cube other ) {
 			return !Object.ReferenceEquals(other,null)

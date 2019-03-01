@@ -156,8 +156,8 @@ namespace CubeSolver {
 		[InlineData("RUR'",0)]   // case 2a
 		[InlineData("F'U'F",0)]  // case 2b
 		[InlineData("U2URU'R'",1)]
-		[InlineData("U2U'F'UF",1)]// fail
-		[InlineData("U2RUR'",1)] // fail
+		[InlineData("U2U'F'UF",1)]
+		[InlineData("U2RUR'",1)]
 		[InlineData("U2F'U'F",1)]
 		public void CanPrepF2L(string knownSolution, int expectedPrepMoves) {
 			var cube = new Cube().Apply(TurnSequence.Parse(knownSolution).Reverse());
@@ -169,8 +169,57 @@ namespace CubeSolver {
 			cube = cube.Apply( prepSolution );
 
 			// verify there is now a direct solution
-			var finalSolution = Solver.PrepareToPlaceFtlPairDirectly(pair,cube);
-			Assert.True(finalSolution._turns.Length <= 4);
+			var finalSolution = Solver.PlaceFtlPairDirectly(pair,cube);
+
+			cube = cube.Apply( finalSolution );
+			Assert_F2LSolved( cube );
+			Assert_CrossSolved( cube );
+		}
+
+		[Theory]
+		// Basic Case 
+		[InlineData("URU'R'")]
+		[InlineData("U'F'UF")]
+		[InlineData("RUR'")]
+		[InlineData("F'U'F")]
+		// top layer, white on the side
+		[InlineData("U'RU'R'URUR'")]
+		[InlineData("UF'UFU'F'U'F")]
+		[InlineData("U'RUR'URUR'")]
+		[InlineData("UF'U'FU'F'U'F")]
+		//[InlineData("dR'U2Rd'RUR'")]
+		//[InlineData("U'RU2R'dR'U'R")]
+		//[InlineData("RU'R'UdR'U'R")]
+		//[InlineData("F'UFU'd'FUF'")]
+		[InlineData("UF'U2FUF'U2F")]
+		[InlineData("U'RU2R'U'RU2R'")]
+		[InlineData("UF'U'FUF'U2F")]
+		[InlineData("U'RUR'U'RU2R'")]
+
+		public void XX(string knownSolution ) {
+			var solveTurns = TurnSequence.Parse( knownSolution );
+			var cube = new Cube().Apply( solveTurns.Reverse() );
+			Assert.True( cube.Apply( solveTurns ).IsSolved, "not solved" );
+
+			var pair = new FtlPair( Side.Front, Side.Right );
+
+			var prepSolution = Solver.FtlSolution( pair, cube );
+			cube=cube.Apply( prepSolution );
+
+			Assert_F2LSolved( cube );
+			Assert_CrossSolved( cube );
+
+		}
+
+		static void Assert_CrossSolved( Cube cube ) {
+			Assert.True( Solver.CrossConstraint.IsMatch( cube ), "cross not solved" );
+		}
+
+		private static void Assert_F2LSolved( Cube cube ) {
+			Assert.True( new FtlPair( Side.Front, Side.Right ).Stationary.IsMatch( cube ),"FrontRight F2L not solved" );
+			Assert.True( new FtlPair( Side.Right, Side.Back ).Stationary.IsMatch( cube ),"BackRight F2L not solved"  );
+			Assert.True( new FtlPair( Side.Back, Side.Left ).Stationary.IsMatch( cube ),"BackLeft F2L not solved"  );
+			Assert.True( new FtlPair( Side.Left, Side.Front ).Stationary.IsMatch( cube ), "FrontLeft F2L not solved" );
 		}
 
 		#region private static
@@ -186,18 +235,6 @@ namespace CubeSolver {
 
 		#endregion
 
-	}
-
-	public class FtlPair {
-
-		public FtlPair(Side leftishSide, Side rightishSide ) {
-			Leftish = leftishSide;
-			Rightish = rightishSide;
-		}
-		public Side Leftish{ get; set; }
-		public Side Rightish{ get; set; }
-		public Edge Edge => new Edge(Leftish,Rightish);
-		public Corner Corner => new Corner(Side.Down,Leftish,Rightish);
 	}
 
 

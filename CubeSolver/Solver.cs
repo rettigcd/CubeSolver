@@ -16,6 +16,13 @@ namespace CubeSolver {
 				.First();
 		}
 
+		static public TurnSequence FtlSolution( FtlPair pair, Cube cube ) {
+			var part1 = PrepareToPlaceFtlPairDirectly( pair, cube );
+			var temp = cube.Apply(part1);
+			var part2 = PlaceFtlPairDirectly( pair, temp );
+			return new TurnSequence(part1._turns.Concat(part2._turns).ToArray());
+		}
+
 		static public TurnSequence PrepareToPlaceFtlPairDirectly( FtlPair pair, Cube cube) {
 
 			var srcEdge = Solver.Find(cube,pair.Edge);
@@ -61,7 +68,10 @@ namespace CubeSolver {
 			// these are constraints to apply move to a solved cube, so constraints don't work on messed up cube
 			var result = Solver.GetStepsToAcheiveMatch(6, new CompoundConstraint(
 				options,
-				CrossConstraint
+				CrossConstraint,
+				new FtlPair( Side.Right, Side.Back ).Stationary,
+				new FtlPair( Side.Back, Side.Left ).Stationary,
+				new FtlPair( Side.Left, Side.Front ).Stationary
 			));
 
 			// Test
@@ -69,8 +79,6 @@ namespace CubeSolver {
 
 			return result;
 		}
-
-		// FYI - FTL => F2L => First 2 Layers
 
 		static public TurnSequence PlaceFtlPairDirectly( FtlPair pair, Cube cube ) {
 
@@ -81,7 +89,10 @@ namespace CubeSolver {
 
 			return Solver.GetStepsToAcheiveMatch(6, new CompoundConstraint(
 				directSolve,
-				CrossConstraint
+				CrossConstraint,
+				new FtlPair( Side.Right, Side.Back ).Stationary,
+				new FtlPair( Side.Back, Side.Left ).Stationary,
+				new FtlPair( Side.Left, Side.Front ).Stationary
 			));
 		}
 

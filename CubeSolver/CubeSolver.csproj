@@ -38,6 +38,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AiSearch, Version=0.1.6998.19078, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AiSearch.0.1.0\lib\net40\AiSearch.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -70,6 +73,7 @@
     <Compile Include="CubeConstraint.cs" />
     <Compile Include="CubeGeometry.cs" />
     <Compile Include="DataGenerating_Tests.cs" />
+    <Compile Include="FtlPair.cs" />
     <Compile Include="IHaveMoveSequence.cs" />
     <Compile Include="OptionalConstraint.cs" />
     <Compile Include="Rotation.cs" />
@@ -105,12 +109,6 @@
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\xunit.analyzers.0.10.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\cot\AiSearch\AiSearch\AiSearch.csproj">
-      <Project>{a6250d41-d7b0-4d45-a38e-1d1ae7cf2401}</Project>
-      <Name>AiSearch</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
