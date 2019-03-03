@@ -22,6 +22,12 @@ namespace CubeSolver {
 			CornerConstraint.Stationary(Corner)
 		);
 
+		public CornerEdgePair Examine( Cube cube ) => new CornerEdgePair( Corner.Examine(cube), Edge.Examine(cube ) );
+
+		public CornerEdgePair Locate(Cube cube) => new CornerEdgePair( Corner.Locate( cube ), Edge.Locate( cube ) );
+
+		public override string ToString() => $"{Corner} {Edge}";
+
 	}
 
 

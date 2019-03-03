@@ -51,6 +51,9 @@ namespace CubeSolver {
 			Turn rightOfSlotDown = new Turn( slot.RightOf, Rotation.CounterClockwise );
 
 			var allowedMoves = new TurnSequence[] {
+				new TurnSequence( u0 ),
+				new TurnSequence( u1 ),
+				new TurnSequence( u2 ),
 				new TurnSequence( rightOfSlotUp, u0, rightOfSlotDown),
 				new TurnSequence( rightOfSlotUp, u1, rightOfSlotDown),
 				new TurnSequence( rightOfSlotUp, u2, rightOfSlotDown),

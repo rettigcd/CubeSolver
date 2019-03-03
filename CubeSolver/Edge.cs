@@ -1,4 +1,6 @@
 ﻿
+using System.Linq;
+
 namespace CubeSolver {
 
 	public class Edge {
@@ -18,6 +20,18 @@ namespace CubeSolver {
 			return (Side0 == other.Side0 && Side1 == other.Side1)
 				|| (Side1 == other.Side0 && Side0 == other.Side1);
 		}
+
+		public Edge Examine( Cube cube ) {
+			return new Edge( cube[Pos0], cube[Pos1] );
+		}
+
+		public Edge Locate( Cube cube ) {
+			return CubeGeometry.AllEdgePositions
+				.First( edge => cube[edge.Pos0] == Side0
+							 && cube[edge.Pos1] == Side1
+				);
+		}
+
 
 		public override string ToString() => Side0+":"+Side1;
 

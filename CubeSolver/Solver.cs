@@ -17,17 +17,19 @@ namespace CubeSolver {
 			var turns = new List<Turn>();
 
 			FtlSlot easiestSlotToSolve = FindEasiestSlotToSolve( cur );
-			int num = HoldingSlotCount(easiestSlotToSolve,cur);
 			while(easiestSlotToSolve != null) {
+				int num = HoldingSlotCount(easiestSlotToSolve,cur);
+				string debug = string.Join("\r\n",Constraints.AllFtlSlots.Select(slot => slot.Home.Examine(cur)));
+				try{
+					var move = PlaceSingleFtlPairFromTop( easiestSlotToSolve, cur );
+					turns.AddRange( move._turns );
+					cur = cur.Apply( move );
+				}catch(MoveNotFoundExcpetion) {
+					string location = easiestSlotToSolve.Home.Locate(cur).ToString();
+					int i = 0;
+				}
 
-				string debug = string.Join("\r\n",Constraints.AllFtlSlots.Select(slot => slot.Examine(cube)));
-
-				var move = PlaceSingleFtlPairFromTop( easiestSlotToSolve, cube );
-				turns.AddRange( move._turns );
-				cur = cur.Apply( move );
-
-
-				easiestSlotToSolve = FindEasiestSlotToSolve( cur ); num = HoldingSlotCount(easiestSlotToSolve,cur);
+				easiestSlotToSolve = FindEasiestSlotToSolve( cur ); 
 			}
 
 			return new TurnSequence(turns.ToArray());
@@ -59,7 +61,7 @@ namespace CubeSolver {
 				.FirstOrDefault();
 		}
 
-		static int HoldingSlotCount(FtlSlot slot,Cube cube) => HoldingSlots( Find( cube, slot ) ).Length;
+		static int HoldingSlotCount(FtlSlot slot,Cube cube) => HoldingSlots( slot.Home.Locate( cube ) ).Length;
 
 		static FtlSlot[] HoldingSlots(CornerEdgePair src) {
 			var holdingSlots = new List<FtlSlot>();
@@ -77,7 +79,7 @@ namespace CubeSolver {
 		static public TurnSequence PlaceSingleFtlPairFromTop( FtlSlot slot, Cube cube ) {
 			Constraints.VerifyConstraint( cube, Constraints.CrossConstraint, "Cross not solved" );
 
-			var pair = Find( cube, slot );
+			var pair = slot.Home.Locate( cube );
 			var holdingSlots = HoldingSlots( pair );
 			var moveGenerator = new SlotTurnGenerator(slot);
 			if( holdingSlots.Length == 1 )
@@ -165,41 +167,19 @@ namespace CubeSolver {
 		#region Cube Finders
 
 		static public CompoundConstraint FindFtlPairAndSolveIt(FtlSlot slot, Cube cube) {
-			CornerEdgePair src = Find( cube, slot );
+			CornerEdgePair src = slot.Home.Locate( cube );
 			return new CompoundConstraint(
 				new CornerConstraint( src.Corner, slot.Home.Corner ),
 				new EdgeConstraint( src.Edge, slot.Home.Edge )
 			);
 		}
 
-		static CornerEdgePair Find(Cube cube, FtlSlot slot) {
-			return new CornerEdgePair(
-				Find( cube, slot.Home.Corner ),
-				Find( cube, slot.Home.Edge )
-			);
-		}
-
 		static public EdgeConstraint FindEdgeAndSolveIt( Cube cube, Edge edge ) {
-			return new EdgeConstraint( Find( cube, edge ), edge );
+			return new EdgeConstraint( edge.Locate( cube ), edge );
 		}
 
 		static public CornerConstraint FindCornerAndSolveIt( Cube cube, Corner corner ) {
-			return new CornerConstraint( Find( cube, corner ), corner );
-		}
-
-		static Edge Find( Cube cube, Edge needle ) {
-			return CubeGeometry.AllEdgePositions
-				.First( edge => cube[edge.Pos0] == needle.Side0
-							 && cube[edge.Pos1] == needle.Side1
-				);
-		}
-
-		static Corner Find( Cube cube, Corner needle ) {
-			return CubeGeometry.AllCornerPositions
-				.First( corner => cube[corner.Pos0] == needle.Side0
-							   && cube[corner.Pos1] == needle.Side1
-							   && cube[corner.Pos2] == needle.Side2
-				);
+			return new CornerConstraint( corner.Locate( cube ), corner );
 		}
 
 		#endregion

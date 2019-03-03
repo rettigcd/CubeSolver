@@ -30,14 +30,6 @@ namespace CubeSolver {
 
 		public override string ToString() => LeftOf+":"+RightOf;
 
-		public string Examine(Cube cube) {
-			var e0 = cube[Home.Edge.Pos0];
-			var e1 = cube[Home.Edge.Pos1];
-			var c0 = cube[Home.Corner.Pos0];
-			var c1 = cube[Home.Corner.Pos1];
-			var c2 = cube[Home.Corner.Pos2];
-			return $"{LeftOf}:{RightOf}=>{e0}:{e1} {c0}:{c1}:{c2}";
-		}
 	}
 
 
